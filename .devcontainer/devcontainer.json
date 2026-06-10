@@ -1,0 +1,44 @@
+{
+  "name": "research-lab",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "USERNAME": "dev",
+      "USER_UID": "1001",
+      "USER_GID": "1001"
+    }
+  },
+  "remoteUser": "dev",
+  "workspaceFolder": "/workspaces/research-lab",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/research-lab,type=bind,consistency=cached",
+  "mounts": [
+    "source=${localWorkspaceFolder}/data,target=/workspaces/research-lab/data,type=bind,consistency=cached",
+    "source=research-lab-uv-cache,target=/home/dev/.cache/uv,type=volume"
+  ],
+  "postCreateCommand": "uv sync || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "ms-toolsai.jupyter",
+        "tamasfe.even-better-toml",
+        "eamodio.gitlens"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/workspaces/research-lab/.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "explicit",
+          "source.organizeImports": "explicit"
+        },
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff"
+        },
+        "files.eol": "\n"
+      }
+    }
+  }
+}
