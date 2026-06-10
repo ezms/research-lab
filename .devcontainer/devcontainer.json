@@ -15,7 +15,7 @@
     "source=${localWorkspaceFolder}/data,target=/workspaces/research-lab/data,type=bind,consistency=cached",
     "source=research-lab-uv-cache,target=/home/dev/.cache/uv,type=volume"
   ],
-  "postCreateCommand": "uv sync || true",
+  "postCreateCommand": "sudo chown -R dev:dev /home/dev/.cache/uv && uv sync --all-extras || true",
   "customizations": {
     "vscode": {
       "extensions": [
