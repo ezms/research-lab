@@ -29,6 +29,9 @@ htmlcov/
 *.swp
 *.swo
 
+# Documentation
+docs/raw/
+
 # Data (research data is not versioned)
 data/
 *.duckdb

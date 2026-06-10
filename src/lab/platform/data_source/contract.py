@@ -27,13 +27,13 @@ class Downloadable(ABC):
 
 class Parseable(ABC):
     @abstractmethod
-    def parse(self, file_path: Path) -> pd.DataFrame:
+    def parse(self, file_path: Path) -> dict[str, pd.DataFrame]:
         pass
 
 
 class VariableMappable(ABC):
     @abstractmethod
-    def map_variables(self, raw_data: pd.DataFrame) -> pd.DataFrame:
+    def map_variables(self, raw_data: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
         pass
 
 
