@@ -1,0 +1,21 @@
+from pydantic import BaseModel
+
+from lab.platform.research.manifest import OutputType, ResearchManifest
+from lab.platform.research.registry import register_research
+from lab.research.housing_reality.params import HousingRealityParams
+
+
+@register_research
+class HousingRealityResearch(ResearchManifest):
+    id = "housing_reality"
+    name = "Realidade Habitacional"
+    description = (
+        "Analisa condições habitacionais brasileiras a partir dos microdados "
+        "do Censo Demográfico 2010, cruzando configuração física dos domicílios "
+        "com composição dos moradores."
+    )
+    params_model = HousingRealityParams
+    output_types = [OutputType.TABLE, OutputType.CHART, OutputType.NOTEBOOK]
+
+    def run(self, params: BaseModel) -> dict:
+        raise NotImplementedError
