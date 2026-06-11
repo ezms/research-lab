@@ -14,6 +14,8 @@ dependencies = [
     "boto3>=1.35.0",
     "pyarrow>=18.0.0",
     "pydantic>=2.9.0",
+    "PySide6>=6.7.0",
+    "matplotlib>=3.9.0",
 ]
 
 [project.optional-dependencies]
@@ -69,6 +71,7 @@ source = ["lab"]
 omit = [
     "*/infrastructure/storage/r2_adapter.py",
     "*/sources/ibge_docs.py",
+    "*/ui/*.py",
 ]
 
 [tool.coverage.report]

@@ -11,9 +11,14 @@
   "remoteUser": "dev",
   "workspaceFolder": "/workspaces/research-lab",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/research-lab,type=bind,consistency=cached",
+  "containerEnv": {
+    "DISPLAY": "${localEnv:DISPLAY}",
+    "QT_X11_NO_MITSHM": "1"
+  },
   "mounts": [
     "source=${localWorkspaceFolder}/data,target=/workspaces/research-lab/data,type=bind,consistency=cached",
-    "source=research-lab-uv-cache,target=/home/dev/.cache/uv,type=volume"
+    "source=research-lab-uv-cache,target=/home/dev/.cache/uv,type=volume",
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
   ],
   "postCreateCommand": "sudo chown -R dev:dev /home/dev/.cache/uv && uv sync --all-extras || true",
   "customizations": {
