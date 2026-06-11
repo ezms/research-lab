@@ -31,10 +31,17 @@ class SaveWorker(QThread):
 
         from lab.infrastructure.database.duckdb_adapter import DuckDBAdapter
 
-        db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
-        db_path.parent.mkdir(parents=True, exist_ok=True)
+        token = os.environ.get("MOTHERDUCK_TOKEN")
         try:
-            db = DuckDBAdapter(db_path=db_path)
+            if token:
+                bootstrap = duckdb.connect(f"md:?motherduck_token={token}")
+                bootstrap.execute("CREATE DATABASE IF NOT EXISTS research")
+                bootstrap.close()
+                db = DuckDBAdapter(connection_string=f"md:research?motherduck_token={token}")
+            else:
+                db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
+                db_path.parent.mkdir(parents=True, exist_ok=True)
+                db = DuckDBAdapter(db_path=db_path)
         except duckdb.IOException:
             raise RuntimeError(
                 "O banco está aberto em outro processo (ex: DBeaver). "

@@ -7,8 +7,17 @@ from lab.platform.database.port import DatabasePort
 
 
 class DuckDBAdapter(DatabasePort):
-    def __init__(self, db_path: Path | None = None) -> None:
-        self._conn = duckdb.connect(str(db_path) if db_path else ":memory:")
+    def __init__(
+        self,
+        db_path: Path | None = None,
+        connection_string: str | None = None,
+    ) -> None:
+        if connection_string:
+            self._conn = duckdb.connect(connection_string)
+        elif db_path:
+            self._conn = duckdb.connect(str(db_path))
+        else:
+            self._conn = duckdb.connect(":memory:")
 
     def query(self, sql: str) -> pd.DataFrame:
         return self._conn.execute(sql).df()

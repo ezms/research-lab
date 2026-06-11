@@ -6,7 +6,7 @@ from typing import Callable
 
 import pandas as pd
 from pydantic import BaseModel
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
     QFrame,
@@ -24,6 +24,39 @@ from lab.platform.research.manifest import OutputType, ResearchManifest
 from lab.ui._pandas_model import PandasTableModel
 from lab.ui._save_worker import SaveWorker
 from lab.ui._worker import ResearchWorker
+
+
+class _RenderWorker(QThread):
+    table_ready: Signal = Signal(object)   # dict[str, dict[str, pd.DataFrame]]
+    chart_ready: Signal = Signal(list, list)  # ufs, counts
+    errored: Signal = Signal(str)
+
+    def __init__(
+        self,
+        results: dict[str, dict[str, Path]],
+        output_type: OutputType,
+    ) -> None:
+        super().__init__()
+        self._results = results
+        self._output_type = output_type
+
+    def run(self) -> None:
+        try:
+            if self._output_type == OutputType.TABLE:
+                data = {
+                    uf: {ft: pd.read_parquet(path) for ft, path in files.items()}
+                    for uf, files in self._results.items()
+                }
+                self.table_ready.emit(data)
+            elif self._output_type == OutputType.CHART:
+                ufs, counts = [], []
+                for uf, files in self._results.items():
+                    if "domicilios" in files:
+                        ufs.append(uf)
+                        counts.append(len(pd.read_parquet(files["domicilios"])))
+                self.chart_ready.emit(ufs, counts)
+        except Exception as exc:
+            self.errored.emit(str(exc))
 
 _BTN_BACK_STYLE = """
     QPushButton {
@@ -84,6 +117,7 @@ class OutputWidget(QWidget):
         self._output_type = output_type
         self._on_back = on_back
         self._worker: ResearchWorker | None = None
+        self._render_worker: _RenderWorker | None = None
         self._save_worker: SaveWorker | None = None
         self._results: dict = {}
         self._build()
@@ -139,29 +173,42 @@ class OutputWidget(QWidget):
     def _cancel(self) -> None:
         if self._worker and self._worker.isRunning():
             self._worker.terminate()
+        if self._render_worker and self._render_worker.isRunning():
+            self._render_worker.terminate()
         self._progress.setVisible(False)
         self._cancel_btn.setVisible(False)
         self._status.setText("Processo interrompido.")
 
     def _on_finished(self, results: dict) -> None:
         self._results = results
-        self._progress.setVisible(False)
-        self._cancel_btn.setVisible(False)
 
         if self._output_type == OutputType.NOTEBOOK:
+            self._progress.setVisible(False)
+            self._cancel_btn.setVisible(False)
             self._open_notebook(results)
             return
 
+        self._status.setText("Preparando visualização…")
+        self._render_worker = _RenderWorker(results, self._output_type)
+        self._render_worker.table_ready.connect(self._on_table_ready)
+        self._render_worker.chart_ready.connect(self._on_chart_ready)
+        self._render_worker.errored.connect(self._on_error)
+        self._render_worker.start()
+
+    def _on_table_ready(self, data: object) -> None:
+        self._progress.setVisible(False)
+        self._cancel_btn.setVisible(False)
         self._root.removeWidget(self._status)
         self._status.deleteLater()
+        self._root.addWidget(self._build_table(data), 1)  # type: ignore[arg-type]
+        self._add_save_row()
 
-        if self._output_type == OutputType.TABLE:
-            self._root.addWidget(self._build_table(results), 1)
-        elif self._output_type == OutputType.CHART:
-            self._root.addWidget(self._build_chart(results), 1)
-        else:
-            self._root.addWidget(QLabel("Tipo de saída não suportado."), 1)
-
+    def _on_chart_ready(self, ufs: list, counts: list) -> None:
+        self._progress.setVisible(False)
+        self._cancel_btn.setVisible(False)
+        self._root.removeWidget(self._status)
+        self._status.deleteLater()
+        self._root.addWidget(self._build_chart(ufs, counts), 1)
         self._add_save_row()
 
     def _on_error(self, message: str) -> None:
@@ -195,11 +242,15 @@ class OutputWidget(QWidget):
 
         import duckdb
 
-        db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
-        if not db_path.exists():
-            return False
         try:
-            conn = duckdb.connect(str(db_path), read_only=True)
+            token = os.environ.get("MOTHERDUCK_TOKEN")
+            if token:
+                conn = duckdb.connect(f"md:research?motherduck_token={token}")
+            else:
+                db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
+                if not db_path.exists():
+                    return False
+                conn = duckdb.connect(str(db_path), read_only=True)
             for uf, files in self._results.items():
                 for file_type in files:
                     table = f"{self._manifest_cls.id}_{uf.lower()}_{file_type}"
@@ -236,7 +287,7 @@ class OutputWidget(QWidget):
 
     # ── TABLE ──────────────────────────────────────────────────────────────
 
-    def _build_table(self, results: dict[str, dict[str, Path]]) -> QWidget:
+    def _build_table(self, data: dict[str, dict[str, pd.DataFrame]]) -> QWidget:
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -246,13 +297,12 @@ class OutputWidget(QWidget):
         layout.setContentsMargins(0, 8, 0, 8)
         layout.setSpacing(12)
 
-        for uf, files in results.items():
-            for file_type, path in files.items():
+        for uf, files in data.items():
+            for file_type, df in files.items():
                 label = QLabel(f"{uf} — {file_type}")
                 label.setStyleSheet("font-weight: bold; color: #89b4fa;")
                 layout.addWidget(label)
 
-                df = pd.read_parquet(path)
                 view = QTableView()
                 view.setModel(PandasTableModel(df))
                 view.setAlternatingRowColors(True)
@@ -273,16 +323,9 @@ class OutputWidget(QWidget):
 
     # ── CHART ──────────────────────────────────────────────────────────────
 
-    def _build_chart(self, results: dict[str, dict[str, Path]]) -> QWidget:
+    def _build_chart(self, ufs: list[str], counts: list[int]) -> QWidget:
         from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
         from matplotlib.figure import Figure
-
-        ufs: list[str] = []
-        counts: list[int] = []
-        for uf, files in results.items():
-            if "domicilios" in files:
-                ufs.append(uf)
-                counts.append(len(pd.read_parquet(files["domicilios"])))
 
         fig = Figure(figsize=(10, 5), tight_layout=True)
         fig.patch.set_facecolor("#1e1e2e")
