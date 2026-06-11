@@ -21,6 +21,7 @@ dev = [
     "ruff>=0.7.0",
     "mypy>=1.13.0",
     "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
     "jupyter>=1.1.0",
     "ipykernel>=6.29.0",
 ]
@@ -61,3 +62,15 @@ files = ["src", "tests"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+addopts = "--cov=lab --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["lab"]
+omit = [
+    "*/infrastructure/storage/r2_adapter.py",
+    "*/sources/ibge_docs.py",
+]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true

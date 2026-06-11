@@ -5,11 +5,9 @@ from lab.enums.uf import UF
 from lab.research.housing_reality.params import HousingRealityParams
 from lab.research.housing_reality.sources.census_2010 import Census2010DataSource
 
-_DATA_DIR = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data"))
-
 
 def run(params: HousingRealityParams) -> dict[str, dict[str, Path]]:
-    work_dir = _DATA_DIR / "census_2010"
+    work_dir = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "census_2010"
     ufs = params.ufs or list(UF)
     results: dict[str, dict[str, Path]] = {}
 
