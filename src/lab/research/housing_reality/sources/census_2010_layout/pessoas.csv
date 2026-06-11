@@ -1,0 +1,245 @@
+variable,description,start,end,length,decimals,type
+V0001,UNIDADE DA FEDERAÇÃO: 11- Rondônia 12- Acre 13- Amazonas 14- Roraima 15- Pará 16- Amapá 17- Tocantins 21- Maranhão 22- Piauí 23- Ceará 24- Rio Grande do Norte 25- Paraíba 26- Pernambuco 27- Alagoas 28- Sergipe 29- Bahia 31- Minas Gerais 32- Espírito Santo 33- Rio de Janeiro 35- São Paulo 41- Paraná 42- Santa Catarina 43- Rio Grande do Sul 50- Mato Grosso do Sul 51- Mato Grosso 52- Goiás 53- Distrito Federal,1,2,2,,A
+V0002,CÓDIGO DO MUNICÍPIO,3,7,5,,A
+V0011,ÁREA DE PONDERAÇÃO,8,20,13,,A
+V0300,CONTROLE,21,28,8,,N
+V0010,PESO AMOSTRAL,29,44,3,13,N
+V1001,REGIÃO GEOGRÁFICA: 1- Região norte (uf=11 a 17) 2- Região nordeste (uf=21 a 29) 3- Região sudeste (uf=31 a 33 e 35) 4- Região sul (uf=41 a 43) 5- Região centro-oeste (uf=50 a 53),45,45,1,,C
+V1002,CÓDIGO DA MESORREGIÃO: A relação de códigos encontra-se no arquivo:,46,47,2,,A
+V1003,CÓDIGO DA MICRORREGIÃO: A relação de códigos encontra-se no arquivo:,48,50,3,,A
+V1004,CÓDIGO DA REGIÃO METROPOLITANA: A relação de códigos encontra-se no arquivo:,51,52,2,,A
+V1006,SITUAÇÃO DO DOMICÍLIO: 1- Urbana 2- Rural,53,53,1,,C
+V0502,"RELAÇÃO DE PARENTESCO OU DE CONVIVÊNCIA COM A PESSOA RESPONSÁVEL PELO DOMICÍLIO: 01- Pessoa responsável pelo domicílio 02- Cônjuge ou companheiro(a) de sexo diferente 03- Cônjuge ou companheiro(a) do mesmo sexo 04- Filho(a) do responsável e do cônjuge 05- Filho(a) somente do responsável 06- Enteado(a) 07- Genro ou nora 08- Pai, mãe, padrasto ou madrasta 09- Sogro(a) 10- Neto(a) 11- Bisneto(a) 12- Irmão ou irmã 13- Avô ou avó 14- Outro parente 15- Agregado(a) 16- Convivente 17- Pensionista 18- Empregado(a) doméstico(a) 19- Parente do(a) empregado(a)  20- Individual em domicílio coletivo",54,55,2,,C
+V0504,ORDEM LÓGICA,56,57,2,,A
+V0601,SEXO: 1- Masculino 2- Feminino,58,58,1,,C
+V6033,VARIÁVEL AUXILIAR DA IDADE CALCULADA (ANOS E MESES): - 1 a 140 -,59,61,3,,N
+V6036,VARIÁVEL AUXILIAR DA IDADE CALCULADA EM ANOS: - 0 a 140,62,64,3,,N
+V6037,VARIÁVEL AUXILIAR DA IDADE CALCULADA EM MESES (PARA AS PESSOAS MENORES DE 1 ANO): - 0 a 11,65,66,2,,N
+V6040,FORMA DE DECLARAÇÃO DA IDADE: 1- Data de nascimento 2- Idade declarada,67,67,1,,C
+V0606,COR OU RAÇA: 1- Branca 2- Preta 3- Amarela 4- Parda 5- Indígena 9- Ignorado,68,68,1,,C
+V0613,REGISTRO DE NASCIMENTO: 1- Do cartório 2- Declaração de nascido vivo (DNV) do hospital ou da maternidade 3- Registro administrativo de nascimento indígena (RANI) 4- Não tem 5- Não sabe 9- Ignorado Branco,69,69,1,,C
+V0614,"DIFICULDADE PERMANENTE DE ENXERGAR: 1- Sim, não consegue de modo algum 2- Sim, grande dificuldade 3- Sim, alguma dificuldade 4- Não, nenhuma dificuldade 9- Ignorado",70,70,1,,C
+V0615,"DIFICULDADE PERMANENTE DE OUVIR: 1- Sim, não consegue de modo algum 2- Sim, grande dificuldade 3- Sim, alguma dificuldade 4- Não, nenhuma dificuldade 9- Ignorado",71,71,1,,C
+V0616,"DIFICULDADE PERMANENTE DE CAMINHAR OU SUBIR DEGRAUS: 1- Sim, não consegue de modo algum 2- Sim, grande dificuldade 3- Sim, alguma dificuldade 4- Não, nenhuma dificuldade 9- Ignorado",72,72,1,,C
+V0617,DEFICIÊNCIA MENTAL/INTELECTUAL PERMANENTE: 1- Sim 2- Não 9- Ignorado,73,73,1,,C
+V0618,NASCEU NESTE MUNICÍPIO: 1- Sim e sempre morou 2- Sim mas morou em outro município ou país estrangeiro 3- Não,74,74,1,,C
+V0619,"NASCEU NESTA UNIDADE DA FEDERAÇÃO: 1- Sim, e sempre morou 2- Sim, mas morou em outra UF ou país estrangeiro 3- Não Branco",75,75,1,,C
+V0620,NACIONALIDADE: 1- Brasileiro nato 2- Naturalizado brasileiro 3- Estrangeiro Branco,76,76,1,,C
+V0621,ANO QUE FIXOU RESIDÊNCIA NO BRASIL: - Branco - 1869 a 2010,77,80,4,,A
+V0622,UF OU PAÍS ESTRANGEIRO DE NASCIMENTO: 1- UF 2- País estrangeiro Branco,81,81,1,,C
+V6222,UNIDADE DA FEDERAÇÃO DE NASCIMENTO – código: - A relação de códigos encontra-se no arquivo: “Migração_UFs_2010 V6222 V 6252 V6262 V6362 V6602.xls”,82,88,7,,A
+V6224,QUAL É O PAÍS ESTRANGEIRO DE NASCIMENTO – código: - A relação de códigos encontra-se no arquivo: “Migração_Países_2010 V3061 V6224 V6256 V6266 V6366 V6606.xls”,89,95,7,,A
+V0623,TEMPO DE MORADIA NA UF: - Branco - 0 a 140,96,98,3,,A
+V0624,TEMPO DE MORADIA NO MUNICÍPIO: - Branco - 0 a 140,99,101,3,,A
+V0625,UNIDADE DA FEDERAÇÃO E MUNICÍPIO OU PAÍS ESTRANGEIRO DE MORADIA ANTES DE MUDAR-SE PARA ESTE MUNICÍPIO: 1- UF/Município 2- País estrangeiro Branco,102,102,1,,C
+V6252,UF DE RESIDÊNCIA ANTERIOR – código: - A relação de códigos encontra-se no arquivo: “Migração_UFs_2010 V6222 V6252 V6262 V6362 V6602.xls”,103,109,7,,A
+V6254,MUNICÍPIO DE RESIDÊNCIA ANTERIOR – código: - A relação de códigos encontra-se no arquivo: “Migração_Município_2010 V6254 V6264 V6364 V6604.xls”,110,116,7,,A
+V6256,PAÍS DE RESIDÊNCIA ANTERIOR – código: - A relação de códigos encontra-se no arquivo: “Migração_Países_2010 V3061 V6224 V6256 V6266 V6366 V6606.xls”,117,123,7,,A
+V0626,RESIDÊNCIA EM 31 DE JULHO DE 2005: 1- UF/Município 2- País estrangeiro Branco,124,124,1,,C
+V6262,UF DE RESIDÊNCIA EM 31 DE JULHO DE 2005 – código: - A relação de códigos encontra-se no arquivo: “Migração_UFs_2010 V6222 V6252 V6262 V6362 V6602.xls”,125,131,7,,A
+V6264,MUNICÍPIO DE RESIDÊNCIA EM 31 DE JULHO DE 2005 – código: - A relação de códigos encontra-se no arquivo: “Migração_Município_2010 V6254 V6264 V6364 V6604.xls”,132,138,7,,A
+V6266,PAÍS DE RESIDÊNCIA EM 31 DE JULHO DE 2005 – código: - A relação de códigos encontra-se no arquivo: “Migração_Países_2010 V3061 V6224 V6256 V6266 V6366 V6606.xls”,139,145,7,,A
+V0627,SABE LER E ESCREVER: 1- Sim 2- Não Branco,146,146,1,,C
+V0628,"FREQUENTA ESCOLA OU CRECHE: 1- Sim, pública 2- Sim, particular 3- Não, já frequentou 4- Não, nunca frequentou",147,147,1,,C
+V0629,CURSO QUE FREQUENTA: 01- Creche 02- Pré-escolar (maternal e jardim da infância) 03- Classe de alfabetização - CA 04- Alfabetização de jovens e adultos 05- Regular do ensino fundamental 06- Educação de jovens e adultos - EJA - ou supletivo do ensino fundamental 07- Regular do ensino médio 08- Educação de jovens e adultos - EJA - ou supletivo do ensino médio 09- Superior de graduação 10- Especialização de nível superior ( mínimo de 360 horas ) 11- Mestrado 12- Doutorado Branco,148,149,2,,C
+V0630,SÉRIE / ANO QUE FREQUENTA: 01- Primeiro ano 02- Primeira série / Segundo ano 03- Segunda série / Terceiro ano 04- Terceira série / Quarto ano 05- Quarta série / Quinto ano 06- Quinta série / Sexto ano 07- Sexta série / Sétimo ano 08- Sétima série / Oitavo ano 09- Oitava série / Nono ano 10- Não seriado Branco,150,151,2,,C
+V0631,SÉRIE QUE FREQUENTA: 1- Primeira série 2- Segunda série 3- Terceira série 4- Quarta série 5- Não seriado Branco,152,152,1,,C
+V0632,CONCLUSÃO DE OUTRO CURSO SUPERIOR DE GRADUAÇÃO: 1- Sim 2- Não Branco,153,153,1,,C
+V0633,"CURSO MAIS ELEVADO QUE FREQUENTOU: 01- Creche, pré-escolar (maternal e jardim de infância), classe de alfabetização - CA 02- Alfabetização de jovens e adultos 03- Antigo primário (elementar) 04- Antigo ginásio (médio 1º ciclo) 05- Ensino fundamental ou 1º grau (da 1ª a 3ª série/ do 1º ao 4º ano) 06- Ensino fundamental ou 1º grau (4ª série/ 5º ano) 07- Ensino fundamental ou 1º grau (da 5ª a 8ª série/ 6º ao 9º ano) 08- Supletivo do ensino fundamental ou do 1º grau 09- Antigo científico, clássico, etc.....(médio 2º ciclo) 10- Regular ou supletivo do ensino médio ou do 2º grau 11- Superior de graduação 12- Especialização de nível superior ( mínimo de 360 horas ) 13- Mestrado 14- Doutorado Branco",154,155,2,,C
+V0634,CONCLUSÃO DESTE CURSO: 1- Sim 2- Não Branco,156,156,1,,C
+V0635,ESPÉCIE DO CURSO MAIS ELEVADO CONCLUÍDO: 1- Superior de graduação 2- Mestrado 3- Doutorado Branco,157,157,1,,C
+V6400,NÍVEL DE INSTRUÇÃO: 1- Sem instrução e fundamental incompleto 2- Fundamental completo e médio incompleto 3- Médio completo e superior incompleto 4- Superior completo 5- Não determinado,158,158,1,,C
+V6352,CURSO SUPERIOR DE GRADUAÇÃO – código: - A relação de códigos encontra-se no arquivo: “Cursos Superiores_Estrutura 2010 V6352.xls”,159,161,3,,A
+V6354,CURSO DE MESTRADO – código: - A relação de códigos encontra-se no arquivo: “Cursos Mestrado_Estrutura 2010 V6354.xls”,162,164,3,,A
+V6356,CURSO DE DOUTORADO – código: - A relação de códigos encontra-se no arquivo: “Cursos Doutorado_Estrutura 2010 V6356.xls”,165,167,3,,A
+V0636,MUNICÍPIO E UNIDADE DA FEDERAÇÃO OU PAÍS ESTRANGEIRO QUE FREQUENTAVA ESCOLA (OU CRECHE): 1- Neste município 2- Em outro município 3- Em país estrangeiro Branco,168,168,1,,C
+V6362,UF QUE FREQUENTAVA ESCOLA (OU CRECHE) – código: - A relação de códigos encontra-se no arquivo: “Migração_UFs_2010 V6222 V6252 V6262 V6362 V6602.xls”,169,175,7,,A
+V6364,MUNICÍPIO QUE FREQUENTAVA ESCOLA (OU CRECHE) – código: - A relação de códigos encontra-se no arquivo: “Migração_Municípios_2010 V6254 V6264 V6364 V6604.xls”,176,182,7,,A
+V6366,PAÍS ESTRANGEIRO QUE FREQUENTAVA ESCOLA (OU CRECHE) – código: - A relação de códigos encontra-se no arquivo: “Migração_Países_2010 V3061 V6224 V6256 V6266 V6366 V6606.xls”,183,189,7,,A
+V0637,"VIVE EM COMPANHIA DE CÔNJUGE OU COMPANHEIRO(A): 1- Sim 2- Não, mas viveu 3- Não, nunca viveu Branco",190,190,1,,C
+V0638,NÚMERO DE ORDEM DO CÔNJUGE OU COMPANHEIRO(A): - Branco - 1 a 98 - 99 = ignorado,191,192,2,,A
+V0639,NATUREZA DA UNIÃO: 1- Casamento civil e religioso 2- Só casamento civil 3- Só casamento religioso 4- União consensual Branco,193,193,1,,C
+V0640,ESTADO CIVIL: 1- Casado(a) 2- Desquitado(a) ou separado(a) judicialmente 3- Divorciado(a) 4- Viúvo(a) 5- Solteiro(a) Branco,194,194,1,,C
+V0641,"NA SEMANA DE 25 A 31/07/10, DURANTE PELO MENOS 1 HORA, TRABALHOU GANHANDO EM DINHEIRO, PRODUTOS, MERCADORIAS OU BENEFÍCIOS: 1- Sim 2- Não Branco",195,195,1,,C
+V0642,"NA SEMANA DE 25 A 31/07/10, TINHA TRABALHO REMUNERADO DO QUAL ESTAVA TEMPORARIAMENTE AFASTADO(A): 1- Sim 2- Não Branco",196,196,1,,C
+V0643,"NA SEMANA DE 25 A 31/07/10, DURANTE PELO MENOS 1 HORA, AJUDOU SEM QUALQUER PAGAMENTO NO TRABALHO REMUNERADO DE MORADOR DO DOMICÍLIO: 1- Sim 2- Não Branco",197,197,1,,C
+V0644,"NA SEMANA DE 25 A 31/07/10, DURANTE PELO MENOS 1 HORA, TRABALHOU NA PLANTAÇÃO, CRIAÇÃO DE ANIMAIS OU PESCA, SOMENTE PARA ALIMENTAÇÃO DOS MORADORES DO DOMICÍLIO (INCLUSIVE CAÇA E EXTRAÇÃO VEGETAL): 1- Sim 2- Não Branco",198,198,1,,C
+V0645,QUANTOS TRABALHOS TINHA: 1- Um 2- Dois ou mais Branco,199,199,1,,C
+V6461,OCUPAÇÃO – código: (pode ter valor branco) - A relação de códigos encontra-se no arquivo: “Ocupação COD_Estrutura 2010.xls”,200,203,4,,A
+V6471,ATIVIDADE – código (pode ter valor branco) - A relação de códigos encontra-se no arquivo: “CNAEDOM2.0_Estrutura 2010.xls”,204,208,5,,A
+V0648,"NESSE TRABALHO ERA: 1- Empregado com carteira de trabalho assinada 2- Militar do exército, marinha, aeronáutica, policia militar ou corpo de bombeiros 3- Empregado pelo regime jurídico dos funcionários públicos 4- Empregado sem carteira de trabalho assinada 5- Conta própria 6- Empregador 7- Não remunerado Branco",209,209,1,,C
+V0649,QUANTAS PESSOAS EMPREGAVA NESSE TRABALHO: 1- 1 a 5 pessoas 2- 6 ou mais pessoas Branco,210,210,1,,C
+V0650,"ERA CONTRIBUINTE DE INSTITUTO DE PREVIDÊNCIA OFICIAL EM ALGUM TRABALHO QUE TINHA NA SEMANA DE 25 A 31 DE JULHO DE 2010: 1- Sim, no trabalho principal 2- Sim, em outro trabalho 3- Não Branco",211,211,1,,C
+V0651,"NO TRABALHO PRINCIPAL, QUAL ERA O RENDIMENTO BRUTO (OU A RETIRADA) MENSAL QUE GANHAVA HABITUALMENTE EM JULHO DE 2010: 0- Não tem 1- Em dinheiro, produtos ou mercadorias 2- Somente em benefícios Branco",212,212,1,,C
+V6511,VALOR DO RENDIMENTO BRUTO (OU A RETIRADA) MENSAL NO TRABALHO PRINCIPAL:,213,218,6,,N
+V6513,RENDIMENTO NO TRABALHO PRINCIPAL:,219,224,6,,N
+V6514,RENDIMENTO NO TRABALHO PRINCIPAL EM Nº DE SALÁRIOS MÍNIMOS:,225,230,4,2,N
+V0652,"NOS DEMAIS TRABALHOS, QUAL ERA O RENDIMENTO BRUTO (OU A RETIRADA) MENSAL QUE GANHAVA HABITUALMENTE EM JULHO DE 2010: 0- Não tem 1- Em dinheiro, produtos ou mercadorias 2- Somente em benefícios Branco",231,231,1,,C
+V6521,VALOR DO RENDIMENTO BRUTO (OU A RETIRADA) MENSAL NOS DEMAIS TRABALHOS (EM REAIS),232,237,6,,N
+V6524,RENDIMENTO BRUTO NOS DEMAIS TRABALHOS EM Nº DE SALÁRIOS MÍNIMOS,238,246,4,5,N
+V6525,RENDIMENTO EM TODOS OS TRABALHOS,247,253,7,,N
+V6526,RENDIMENTO EM TODOS OS TRABALHOS EM Nº DE SALÁRIOS MÍNIMOS,254,262,4,5,N
+V6527,RENDIMENTO MENSAL TOTAL EM JULHO DE 2010,263,269,7,,N
+V6528,RENDIMENTO MENSAL TOTAL EM Nº DE SALÁRIOS MÍNIMOS EM JULHO DE 2010,270,278,4,5,N
+V6529,RENDIMENTO DOMICILIAR (DOMICÍLIO PARTICULAR) EM JULHO DE 2010,279,285,7,,N
+V6530,RENDIMENTO DOMICILIAR (DOMICÍLIO PARTICULAR) EM Nº DE SALÁRIOS MÍNIMOS EM JULHO DE 2010,286,295,5,5,N
+V6531,RENDIMENTO DOMICILIAR (DOMICÍLIO PARTICULAR) PER CAPITA EM JULHO DE 2010,296,303,6,2,N
+V6532,RENDIMENTO DOMICILIAR (DOMICÍLIO PARTICULAR) PER CAPITA EM Nº DE SALÁRIOS MÍNIMOS EM JULHO DE 2010,304,312,4,5,N
+V0653,"NO TRABALHO PRINCIPAL, QUANTAS HORAS TRABALHAVA HABITUALMENTE POR SEMANA: - Branco - 1 a 140",313,315,3,,N
+V0654,"NO PERÍODO DE 02 A 31 DE JULHO DE 2010, TOMOU ALGUMA PROVIDÊNCIA, DE FATO, PARA CONSEGUIR  1- Sim 2- Não Branco",316,316,1,,C
+V0655,"SE TIVESSE CONSEGUIDO TRABALHO, ESTARIA DISPONÍVEL PARA ASSUMI-LO NA SEMANA DE 25 A 31 DE JULHO DE 2010? 1- Sim 2- Não Branco",317,317,1,,C
+V0656,"EM JULHO DE 2010, TINHA RENDIMENTO MENSAL HABITUAL DE APOSENTADORIA OU PENSÃO DE INSTITUTO DE PREVIDÊNCIA OFICIAL (FEDERAL, ESTADUAL OU MUNICIPAL)? 1- Sim 0- Não 9- Ignorado Branco",318,318,1,,C
+V0657,"EM JULHO DE 2010, TINHA RENDIMENTO MENSAL HABITUAL DE PROGRAMA SOCIAL BOLSA-FAMÍLIA OU PROGRAMA DE ERRADICAÇÃO DO TRABALHO INFANTIL (PETI): 1- Sim 0- Não 9- Ignorado Branco",319,319,1,,C
+V0658,"EM JULHO 2010, TINHA RENDIMENTO MENSAL HABITUAL DE OUTROS PROGRAMAS SOCIAIS OU DE TRANSFERÊNCIAS: 1- Sim 0- Não 9- Ignorado Branco",320,320,1,,C
+V0659,"EM JULHO DE 2010, TINHA RENDIMENTO MENSAL HABITUAL DE OUTRAS FONTES (JUROS DE POUPANÇA, APLICAÇÕES FINANCEIRAS, ALUGUEL, PENSÃO, APOSENTADORIA DE PREVIDÊNCIA PRIVADA, ETC)? 1- Sim 0- Não 9- Ignorado Branco",321,321,1,,C
+V6591,EM JULHO DE 2010 QUAL FOI O VALOR TOTAL DESTE(S) RENDIMENTO(S):,322,327,6,,N
+V0660,"EM QUE MUNICÍPIO E UNIDADE DA FEDERAÇÃO OU PAÍS ESTRANGEIRO TRABALHA: 1- No próprio domicílio 2- Apenas neste município, mas não no próprio domicílio 3- Em outro município 4- Em país estrangeiro 5- Em mais de um município ou país Branco",328,328,1,,C
+V6602,EM QUE UNIDADE DA FEDERAÇÃO TRABALHAVA - código: - A relação de códigos encontra-se no arquivo: “Migração_UFs_2010 V6222 V6252 V6262 V6362 V6602.xls”,329,335,7,,A
+V6604,EM QUE MUNICÍPIO TRABALHAVA - código: - A relação de códigos encontra-se no arquivo: “Migração_Municípios_2010 V6254 V6264 V6364 V6604.xls”,336,342,7,,A
+V6606,EM QUE PAÍS ESTRANGEIRO TRABALHAVA - código: - A relação de códigos encontra-se no arquivo: “Migração_Países_2010 V3061 V6224 V6256 V6266 V6366 V6606.xls”,343,349,7,,A
+V0661,RETORNA DO TRABALHO PARA CASA DIARIAMENTE: 1- Sim 2- Não Branco,350,350,1,,C
+V0662,QUAL É O TEMPO HABITUAL GASTO DE DESLOCAMENTO DE SUA CASA ATÉ O TRABALHO: 1- Até 05 minutos 2- De 06 minutos até meia hora 3- Mais de meia hora até uma hora 4- Mais de uma hora até duas horas 5- Mais de duas horas Branco,351,351,1,,C
+V0663,QUANTOS FILHOS E FILHAS NASCIDOS VIVOS TEVE ATÉ 31 DE JULHO DE 2010: 1- Teve filhos nascidos vivos 2- Não teve nenhum filho nascido vivo Branco,352,352,1,,C
+V6631,QUANTOS FILHOS NASCIDOS VIVOS TEVE ATÉ 31 DE JULHO DE 2010: (branco; 0 a 31),353,354,2,,N
+V6632,QUANTAS FILHAS NASCIDAS VIVAS TEVE ATÉ 31 DE JULHO DE 2010: (branco; 0 a 31),355,356,2,,N
+V6633,TOTAL DE FILHOS NASCIDOS VIVOS QUE TEVE ATÉ 31 DE JULHO DE 2010: (branco; 0 a 31),357,358,2,,N
+V0664,"DOS FILHOS E FILHAS QUE TEVE, QUANTOS ESTAVAM VIVOS EM 31 DE JULHO DE 2010: 1- Filhos vivos 2- Não sabe Branco",359,359,1,,C
+V6641,"DOS FILHOS QUE TEVE, QUANTOS ESTAVAM VIVOS EM 31 DE JULHO DE 2010: - Branco - 0 a 31",360,361,2,,N
+V6642,"DAS FILHAS QUE TEVE, QUANTAS ESTAVAM VIVAS EM 31 DE JULHO DE 2010: - Branco - 0 a 31",362,363,2,,N
+V6643,"TOTAL DE FILHOS QUE TEVE, QUANTOS ESTAVAM VIVOS EM 31 DE JULHO DE 2010: - Branco - 0 a 31",364,365,2,,N
+V0665,QUAL É O SEXO DO ÚLTIMO FILHO TIDO NASCIDO VIVO ATÉ 31 DE JULHO DE 2010: 1- Masculino 2- Feminino Branco,366,366,1,,C
+V6660,IDADE DO ÚLTIMO FILHO TIDO NASCIDO VIVO ATÉ 31 DE JULHO DE 2010: - Branco - 0 a 130,367,369,3,,N
+V6664,EXISTÊNCIA DE FILHO TIDO NASCIDO VIVO NO PERÍODO DE REFERÊNCIA DE 12 MESES ANTERIORES A 31/07/2010: 1- Sim 0- Não Branco,370,370,1,,C
+V0667,ESTE(A) FILHO(A) ESTAVA VIVO(A) EM 31 DE JULHO DE 2010: 1- Sim 2- Não 9- Não sabe Branco,371,371,1,,C
+V0668,QUAL FOI O MÊS E O ANO QUE ESTE(A) FILHO(A) FALECEU: 1- Sabe o mês e ano ou somente o ano 2- Não sabe Branco,372,372,1,,C
+V6681,QUAL FOI O MÊS QUE ESTE(A) FILHO(A) FALECEU: - Branco - 1 a 12 - 99 = ignorado,373,374,2,,A
+V6682,QUAL FOI O ANO QUE ESTE(A) FILHO(A) FALECEU: - Branco -  - 9999 = ignorado,375,378,4,,A
+V0669,QUANTOS FILHOS E FILHAS NASCIDOS MORTOS TEVE ATÉ 31 DE JULHO DE 2010: 1- Teve filho nascido morto 2- Não teve filho nascido morto 3- Não sabe Branco,379,379,1,,C
+V6691,QUANTOS FILHOS NASCIDOS MORTOS TEVE ATÉ 31 DE JULHO DE 2010 - Branco - 0 a 31,380,381,2,,N
+V6692,QUANTOS FILHAS NASCIDAS MORTAS TEVE ATÉ 31 DE JULHO DE 2010 - Branco - 0 a 31,382,383,2,,N
+V6693,QUANTOS FILHOS E FILHAS NASCIDOS MORTOS TEVE ATÉ 31 DE JULHO DE 2010 - Branco - 0 a 31,384,385,2,,N
+V6800,TOTAL DE FILHOS TIDOS NASCIDOS VIVOS E NASCIDOS MORTOS: - Branco - 0 a 31,386,387,2,,N
+V0670,ASSINALE QUEM PRESTOU AS INFORMAÇÕES DESTA PESSOA 1- A própria pessoa 2- Outro morador 3- Não morador 9- Ignorado,388,388,1,,C
+V0671,NÚMERO DE ORDEM DO INFORMANTE (OUTRO MORADOR),389,390,2,,A
+V6900,CONDIÇÃO DE ATIVIDADE NA SEMANA DE REFERÊNCIA 1- Economicamente ativas 2- Não economicamente ativas Branco,391,391,1,,C
+V6910,CONDIÇÃO DE OCUPAÇÃO NA SEMANA DE REFERÊNCIA 1- Ocupadas 2- Desocupadas Branco,392,392,1,,C
+V6920,SITUAÇÃO DE OCUPAÇÃO NA SEMANA DE REFERÊNCIA 1- Ocupadas 2- Não ocupadas Branco,393,393,1,,C
+V6930,POSIÇÃO NA OCUPAÇÃO E CATEGORIA DO EMPREGO NO TRABALHO PRINCIPAL 1- Empregados com carteira de trabalho assinada 2- Militares e funcionários públicos estatutários 3- Empregados sem carteira de trabalho assinada 4- Conta própria 5- Empregadores 6- Não remunerados 7- Trabalhadores na produção para o próprio consumo Branco,394,394,1,,C
+V6940,SUBGRUPO E CATEGORIA DO EMPREGO NO TRABALHO PRINCIPAL 1- Trabalhadores domésticos com carteira de trabalho assinada 2- Trabalhadores domésticos sem carteira de trabalho assinada 3- Demais empregados com carteira de trabalho assinada 4- Militares e funcionários públicos estatutários 5- Demais empregados sem carteira de trabalho assinada Branco,395,395,1,,C
+V6121,Qual é a sua religião ou culto? -,396,398,3,,A
+V0604,TEM MÃE VIVA? 1-  2-  3-  4-  9-,399,399,1,,C
+V0605,Número de ordem da mãe da pessoa,400,401,2,,A
+V5020,"NÚMERO DA FAMÍLIA 01 - Famílias únicas ou conviventes principais: Corresponde à família dos responsáveis pela unidade doméstica. 02 – Família convivente – segunda 03 – Família convivente – terceira 04 – Família convivente – quarta 05 – Família convivente – quinta 06 – Família convivente – sexta 07 – Família convivente – sétima 08 – Família convivente – oitava 09 – Família convivente – nona Branco – para pessoas residentes em domicílios coletivos e/ou em unidades domésticas localizadas em terras indígenas, onde não se fez a identificação de famílias.",402,403,2,,C
+V5060,Número de Pessoas na Família,404,405,2,,N
+V5070,"Rendimento familiar per capita em julho de 2010 (0 a 999999,99)",406,413,6,2,N
+V5080,"Rendimento familiar per capita em nº de salários mínimos em julho de 2010 (0 a 9999,99999)",414,422,4,5,N
+V6462,Qual era a ocupação que exercia no trabalho que tinha? - código 2000,423,426,4,,A
+V6472,Qual era a atividade principal do empreendimento em que tinha esse trabalho? - código 2000,427,431,5,,A
+V5110,CONDIÇÃO DE CONTRIBUIÇÃO PARA INSTITUTO DE PREVIDÊNCIA OFICIAL NO TRABALHO PRINCIPAL Contribuintes Não contribuintes Branco,432,432,1,,C
+V5120,CONDIÇÃO DE CONTRIBUIÇÃO PARA INSTITUTO DE PREVIDÊNCIA OFICIAL EM QUALQUER TRABALHO Contribuintes Não contribuintes Branco,433,433,1,,C
+V5030,TIPO DE UNIDADE DOMÉSTICA 1 - Unipessoal 2 - Duas pessoas ou mais sem parentesco 3 - Duas pessoas ou mais com parentesco Branco,434,434,1,,C
+V5040,INDICADORA DE FAMÍLIA 1 - Arranjo familiar 0 - Arranjo não familiar Branco,435,435,1,,C
+V5090,TIPO DE COMPOSIÇÃO FAMILIAR DAS FAMÍLIAS ÚNICAS E CONVIVENTES PRINCIPAIS 1 - Casal sem filho(s) 2 - Casal sem filho(s) e com parente(s) 3 - Casal com filho(s) 4 - Casal com filho(s) e com parente(s) 5 - Mulher sem cônjuge com filho(s) 6 - Mulher sem cônjuge com filho(s) e com parente(s) 7 - Homem sem cônjuge com filho(s) 8 - Homem sem cônjuge com filho(s) e com parente(s) 9 - Outro Branco,436,436,1,,C
+V5100,TIPO DE COMPOSIÇÃO FAMILIAR DAS FAMÍLIAS CONVIVENTES SECUNDÁRIAS 1 - Casal sem filho(s) 2 - Casal com filho(s) 3 - Mulher sem cônjuge com filho(s) Branco,437,437,1,,C
+V5130,ORDEM LÓGICA NA FAMÍLIA,438,439,2,,A
+M0502,MARCA DE IMPUTAÇÃO NA V0502 1- Sim 2- Não,440,440,1,,C
+M0601,MARCA DE IMPUTAÇÃO NA V0601 1- Sim 2- Não,441,441,1,,C
+M6033,MARCA DE IMPUTAÇÃO NA V6033 1- Sim 2- Não,442,442,1,,C
+M0606,MARCA DE IMPUTAÇÃO NA V0606 1- Sim 2- Não,443,443,1,,C
+M0613,MARCA DE IMPUTAÇÃO NA V0613 1- Sim 2- Não,444,444,1,,C
+M0614,MARCA DE IMPUTAÇÃO NA V0614 1- Sim 2- Não,445,445,1,,C
+M0615,MARCA DE IMPUTAÇÃO NA V0615 1- Sim 2- Não,446,446,1,,C
+M0616,MARCA DE IMPUTAÇÃO NA V0616 1- Sim 2- Não,447,447,1,,C
+M0617,MARCA DE IMPUTAÇÃO NA V0617 1- Sim 2- Não,448,448,1,,C
+M0618,MARCA DE IMPUTAÇÃO NA V0618 1- Sim 2- Não,449,449,1,,C
+M0619,MARCA DE IMPUTAÇÃO NA V0619 1- Sim 2- Não,450,450,1,,C
+M0620,MARCA DE IMPUTAÇÃO NA V0620 1- Sim 2- Não,451,451,1,,C
+M0621,MARCA DE IMPUTAÇÃO NA V0621 1- Sim 2- Não,452,452,1,,C
+M0622,MARCA DE IMPUTAÇÃO NA V0622 1- Sim 2- Não,453,453,1,,C
+M6222,MARCA DE IMPUTAÇÃO NA V6222 1- Sim 2- Não,454,454,1,,C
+M6224,MARCA DE IMPUTAÇÃO NA V6224 1- Sim,455,455,1,,C
+M0623,MARCA DE IMPUTAÇÃO NA V0623 1- Sim 2- Não,456,456,1,,C
+M0624,MARCA DE IMPUTAÇÃO NA V0624 1- Sim 2- Não,457,457,1,,C
+M0625,MARCA DE IMPUTAÇÃO NA V0625 1- Sim 2- Não,458,458,1,,C
+M6252,MARCA DE IMPUTAÇÃO NA V6252 1- Sim 2- Não,459,459,1,,C
+M6254,MARCA DE IMPUTAÇÃO NA V6254 1- Sim,460,460,1,,C
+M6256,MARCA DE IMPUTAÇÃO NA V6256 1- Sim 2- Não,461,461,1,,C
+M0626,MARCA DE IMPUTAÇÃO NA V0626 1- Sim 2- Não,462,462,1,,C
+M6262,MARCA DE IMPUTAÇÃO NA V6262 1- Sim 2- Não,463,463,1,,C
+M6264,MARCA DE IMPUTAÇÃO NA V6264 1- Sim 2- Não,464,464,1,,C
+M6266,MARCA DE IMPUTAÇÃO NA V6266 1- Sim 2- Não,465,465,1,,C
+M0627,MARCA DE IMPUTAÇÃO NA V0627 1- Sim 2- Não,466,466,1,,C
+M0628,MARCA DE IMPUTAÇÃO NA V0628 1- Sim 2- Não,467,467,1,,C
+M0629,MARCA DE IMPUTAÇÃO NA V0629 1- Sim 2- Não,468,468,1,,C
+M0630,MARCA DE IMPUTAÇÃO NA V0630 1- Sim 2- Não,469,469,1,,C
+M0631,MARCA DE IMPUTAÇÃO NA V0631 1- Sim 2- Não,470,470,1,,C
+M0632,MARCA DE IMPUTAÇÃO NA V0632 1- Sim 2- Não,471,471,1,,C
+M0633,MARCA DE IMPUTAÇÃO NA V0633 1- Sim 2- Não,472,472,1,,C
+M0634,MARCA DE IMPUTAÇÃO NA V0634 1- Sim 2- Não,473,473,1,,C
+M0635,MARCA DE IMPUTAÇÃO NA V0635 1- Sim 2- Não,474,474,1,,C
+M6352,MARCA DE IMPUTAÇÃO NA V6352 1- Sim 2- Não,475,475,1,,C
+M6354,MARCA DE IMPUTAÇÃO NA V6354 1- Sim 2- Não,476,476,1,,C
+M6356,MARCA DE IMPUTAÇÃO NA V6356 1- Sim 2- Não,477,477,1,,C
+M0636,MARCA DE IMPUTAÇÃO NA V0636 1- Sim 2- Não,478,478,1,,C
+M6362,MARCA DE IMPUTAÇÃO NA V6362 1- Sim 2- Não,479,479,1,,C
+M6364,MARCA DE IMPUTAÇÃO NA V6364 1- Sim 2- Não,480,480,1,,C
+M6366,MARCA DE IMPUTAÇÃO NA V6366 1- Sim 2- Não,481,481,1,,C
+M0637,MARCA DE IMPUTAÇÃO NA V0637 1- Sim 2- Não,482,482,1,,C
+M0638,MARCA DE IMPUTAÇÃO NA V0638 1- Sim 2- Não,483,483,1,,C
+M0639,MARCA DE IMPUTAÇÃO NA V0639 1- Sim 2- Não,484,484,1,,C
+M0640,MARCA DE IMPUTAÇÃO NA V0640 1- Sim 2- Não,485,485,1,,C
+M0641,MARCA DE IMPUTAÇÃO NA V0641 1- Sim 2- Não,486,486,1,,C
+M0642,MARCA DE IMPUTAÇÃO NA V0642 1- Sim 2- Não,487,487,1,,C
+M0643,MARCA DE IMPUTAÇÃO NA V0643 1- Sim 2- Não,488,488,1,,C
+M0644,MARCA DE IMPUTAÇÃO NA V0644 1- Sim 2- Não,489,489,1,,C
+M0645,MARCA DE IMPUTAÇÃO NA V0645 1- Sim 2- Não,490,490,1,,C
+M6461,MARCA DE IMPUTAÇÃO NA V6461 1- Sim 2- Não,491,491,1,,C
+M6471,MARCA DE IMPUTAÇÃO NA V6471 1- Sim 2- Não,492,492,1,,C
+M0648,MARCA DE IMPUTAÇÃO NA V0648 1- Sim 2- Não,493,493,1,,C
+M0649,MARCA DE IMPUTAÇÃO NA V0649 1- Sim 2- Não,494,494,1,,C
+M0650,MARCA DE IMPUTAÇÃO NA V0650 1- Sim 2- Não,495,495,1,,C
+M0651,MARCA DE IMPUTAÇÃO NA V0651 1- Sim 2- Não,496,496,1,,C
+M6511,MARCA DE IMPUTAÇÃO NA V6511 1- Sim 2- Não,497,497,1,,C
+M0652,MARCA DE IMPUTAÇÃO NA V0652 1- Sim 2- Não,498,498,1,,C
+M6521,MARCA DE IMPUTAÇÃO NA V6521 1- Sim 2- Não,499,499,1,,C
+M0653,MARCA DE IMPUTAÇÃO NA V0653 1- Sim 2- Não,500,500,1,,C
+M0654,MARCA DE IMPUTAÇÃO NA V0654 1- Sim 2- Não,501,501,1,,C
+M0655,MARCA DE IMPUTAÇÃO NA V0655 1- Sim 2- Não,502,502,1,,C
+M0656,MARCA DE IMPUTAÇÃO NA V0656 1- Sim 2- Não,503,503,1,,C
+M0657,MARCA DE IMPUTAÇÃO NA V0657 1- Sim 2- Não,504,504,1,,C
+M0658,MARCA DE IMPUTAÇÃO NA V0658 1- Sim 2- Não,505,505,1,,C
+M0659,MARCA DE IMPUTAÇÃO NA V0659 1- Sim 2- Não,506,506,1,,C
+M6591,MARCA DE IMPUTAÇÃO NA V6591 1- Sim 2- Não,507,507,1,,C
+M0660,MARCA DE IMPUTAÇÃO NA V0660 1- Sim 2- Não,508,508,1,,C
+M6602,MARCA DE IMPUTAÇÃO NA V6602 1- Sim 2- Não,509,509,1,,C
+M6604,MARCA DE IMPUTAÇÃO NA V6604 1- Sim 2- Não,510,510,1,,C
+M6606,MARCA DE IMPUTAÇÃO NA V6606 1- Sim 2- Não,511,511,1,,C
+M0661,MARCA DE IMPUTAÇÃO NA V0661 1- Sim,512,512,1,,C
+M0662,MARCA DE IMPUTAÇÃO NA V0662 1- Sim 2- Não,513,513,1,,C
+M0663,MARCA DE IMPUTAÇÃO NA V0663 1- Sim 2- Não,514,514,1,,C
+M6631,MARCA DE IMPUTAÇÃO NA V6631 1- Sim 2- Não,515,515,1,,C
+M6632,MARCA DE IMPUTAÇÃO NA V6632 1- Sim 2- Não,516,516,1,,C
+M6633,MARCA DE IMPUTAÇÃO NA V6633 1- Sim 2- Não,517,517,1,,C
+M0664,MARCA DE IMPUTAÇÃO NA V0664 1- Sim 2- Não,518,518,1,,C
+M6641,MARCA DE IMPUTAÇÃO NA V6641 1- Sim 2- Não,519,519,1,,C
+M6642,MARCA DE IMPUTAÇÃO NA V6642 1- Sim 2- Não,520,520,1,,C
+M6643,MARCA DE IMPUTAÇÃO NA V6643 1- Sim 2- Não,521,521,1,,C
+M0665,MARCA DE IMPUTAÇÃO NA V0665 1- Sim 2- Não,522,522,1,,C
+M6660,MARCA DE IMPUTAÇÃO NA V6660 1- Sim 2- Não,523,523,1,,C
+M0667,MARCA DE IMPUTAÇÃO NA V0667 1- Sim 2- Não,524,524,1,,C
+M0668,MARCA DE IMPUTAÇÃO NA V0668 1- Sim 2- Não,525,525,1,,C
+M6681,MARCA DE IMPUTAÇÃO NA V6681 1- Sim 2- Não,526,526,1,,C
+M6682,MARCA DE IMPUTAÇÃO NA V6682 1- Sim 2- Não,527,527,1,,C
+M0669,MARCA DE IMPUTAÇÃO NA V0669 1- Sim 2- Não,528,528,1,,C
+M6691,MARCA DE IMPUTAÇÃO NA V6691 1- Sim 2- Não,529,529,1,,C
+M6692,MARCA DE IMPUTAÇÃO NA V6692 1- Sim 2- Não,530,530,1,,C
+M6693,MARCA DE IMPUTAÇÃO NA V6693 1- Sim 2- Não,531,531,1,,C
+M0670,MARCA DE IMPUTAÇÃO NA V0670 1- Sim 2- Não,532,532,1,,C
+M0671,MARCA DE IMPUTAÇÃO NA V0671 1- Sim 2- Não,533,533,1,,C
+M6800,MARCA DE IMPUTAÇÃO NA V6800 1- Sim 2- Não,534,534,1,,C
+M6121,MARCA DE IMPUTAÇÃO NA V6121 1- Sim 2- Não,535,535,1,,C
+M0604,MARCA DE IMPUTAÇÃO NA V0604 1- Sim 2- Não,536,536,1,,C
+M0605,MARCA DE IMPUTAÇÃO NA V0605 1- Sim 2- Não,537,537,1,,C
+M6462,MARCA DE IMPUTAÇÃO NA V6462 1- Sim 2- Não,538,538,1,,C
+M6472,MARCA DE IMPUTAÇÃO NA V6472 1- Sim 2- Não,539,539,1,,C
+V1005,Situação do setor 1 - Área urbanizada 2 - Área não urbanizada 3 - Área urbanizada isolada 4 - Área rural de extensão urbana 5 - Aglomerado rural (povoado) 6 - Aglomerado rural (núcleo) 7 - Aglomerado rural (outros) 8 - Área rural exclusive aglomerado rural  1- Masculino 2- Feminino,540,540,1,,C

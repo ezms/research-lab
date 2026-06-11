@@ -1,0 +1,77 @@
+variable,description,start,end,length,decimals,type
+V0001,UNIDADE DA FEDERAÇÃO: 11- Rondônia 12- Acre 13- Amazonas 14- Roraima 15- Pará 16- Amapá 17- Tocantins 21- Maranhão 22- Piauí 23- Ceará 24- Rio Grande do Norte 25- Paraíba 26- Pernambuco 27- Alagoas 28- Sergipe 29- Bahia 31- Minas Gerais 32- Espírito Santo 33- Rio de Janeiro 35- São Paulo 41- Paraná 42- Santa Catarina 43- Rio Grande do Sul 50- Mato Grosso do Sul 51- Mato Grosso 52- Goiás 53- Distrito Federal,1,2,2,,A
+V0002,CÓDIGO DO MUNICÍPIO,3,7,5,,A
+V0011,ÁREA DE PONDERAÇÃO,8,20,13,,A
+V0300,CONTROLE,21,28,8,,N
+V0010,PESO AMOSTRAL,29,44,3,13,N
+V1001,REGIÃO GEOGRÁFICA: 1- Região norte (uf=11 a 17) 2- Região nordeste (uf=21 a 29) 3- Região sudeste (uf=31 a 33 e 35) 4- Região sul (uf=41 a 43) 5- Região centro-oeste (uf=50 a 53),45,45,1,,C
+V1002,CÓDIGO DA MESORREGIÃO: A relação de códigos encontra-se no arquivo:,46,47,2,,A
+V1003,CÓDIGO DA MICRORREGIÃO: A relação de códigos encontra-se no arquivo:,48,50,3,,A
+V1004,CÓDIGO DA REGIÃO METROPOLITANA: A relação de códigos encontra-se no arquivo:,51,52,2,,A
+V1006,SITUAÇÃO DO DOMICÍLIO: 1- Urbana 2- Rural,53,53,1,,C
+V4001,ESPÉCIE DE UNIDADE VISITADA: 01- Domicílio particular permanente ocupado 02- Domicílio particular permanente ocupado sem entrevista realizada 05- Domicílio particular improvisado ocupado 06- Domicílio coletivo com morador,54,55,2,,C
+V4002,"TIPO DE ESPÉCIE: 11- Casa 12- Casa de vila ou em condomínio 13- Apartamento 14- Habitação em: casa de cômodos, cortiço ou cabeça de porco 15- Oca ou maloca 51- Tenda ou barraca 52- Dentro de estabelecimento 53- Outro (vagão, trailer, gruta, etc) 61- Asilo, orfanato e similares  62- Hotel, pensão e similares com morador 63- Alojamento de trabalhadores com morador 64- Penitenciária, presídio ou casa de detenção com morador 65- Outro com morador",56,57,2,,C
+V0201,"DOMICÍLIO, CONDIÇÃO DE OCUPAÇÃO: 1- Próprio de algum morador - já pago 2- Próprio de algum morador - ainda pagando 3- Alugado 4- Cedido por empregador 5- Cedido de outra forma 6- Outra condição Branco",58,58,1,,C
+V2011,VALOR DO ALUGUEL (EM REAIS),59,64,6,,N
+V2012,ALUGUEL EM Nº DE SALÁRIOS MÍNIMOS,65,73,4,5,N
+V0202,"MATERIAL PREDOMINANTE, PAREDES EXTERNAS: 1- Alvenaria com revestimento 2- Alvenaria sem revestimento 3- Madeira apropriada para construção (aparelhada) 4- Taipa revestida 5- Taipa não revestida 6- Madeira aproveitada 7- Palha 8- Outro material 9- Sem parede Branco",74,74,1,,C
+V0203,"CÔMODOS, NÚMERO: - Branco - 1 a 30",75,76,2,,N
+V6203,DENSIDADE DE MORADOR/CÔMODO,77,79,2,1,N
+V0204,"CÔMODOS COMO DORMITÓRIO, NÚMERO: - Branco - 1 a 15",80,81,2,,N
+V6204,DENSIDADE DE MORADOR / DORMITÓRIO,82,84,2,1,N
+V0205,"BANHEIROS DE USO EXCLUSIVO, NÚMERO: 0- Zero banheiros 1- Um banheiro 2- Dois banheiros 3- Três banheiros 4- Quatro banheiros 5- Cinco banheiros 6- Seis banheiros 7- Sete banheiros 8- Oito banheiros 9- Nove ou mais banheiros Branco",85,85,1,,C
+V0206,"SANITÁRIO OU BURACO PARA DEJEÇÕES, EXISTÊNCIA: 1- Sim 2- Não Branco",86,86,1,,C
+V0207,"ESGOTAMENTO SANITÁRIO, TIPO: 1- Rede geral de esgoto ou pluvial 2- Fossa séptica 3- Fossa rudimentar 4- Vala 5- Rio, lago ou mar 6- Outro Branco",87,87,1,,C
+V0208,"ABASTECIMENTO DE ÁGUA, FORMA: 01- Rede geral de distribuição 02- Poço ou nascente na propriedade 03- Poço ou nascente fora da propriedade 04- Carro-pipa 05- Água da chuva armazenada em cisterna 06- Água da chuva armazenada de outra forma 07- Rios, açudes, lagos e igarapés 08- Outra 09- Poço ou nascente na aldeia 10- Poço ou nascente fora da aldeia Branco",88,89,2,,C
+V0209,"ABASTECIMENTO DE ÁGUA, CANALIZAÇÃO: 1- Sim, em pelo menos um cômodo 2- Sim, só na propriedade ou terreno 3- Não Branco",90,90,1,,C
+V0210,"LIXO, DESTINO: 1- Coletado diretamente por serviço de limpeza 2- Colocado em caçamba de serviço de limpeza 3- Queimado (na propriedade) 4- Enterrado (na propriedade) 5- Jogado em terreno baldio ou logradouro 6- Jogado em rio, lago ou mar 7- Tem outro destino Branco",91,91,1,,C
+V0211,"ENERGIA ELÉTRICA, EXISTÊNCIA: 1- Sim, de companhia distribuidora 2- Sim, de outras fontes 3- Não existe energia elétrica Branco",92,92,1,,C
+V0212,"EXISTÊNCIA DE MEDIDOR OU RELÓGIO, ENERGIA ELÉTRICA, COMPANHIA DISTRIBUIDORA: 1- Sim, de uso exclusivo 2- Sim, de uso comum 3- Não tem medidor ou relógio Branco",93,93,1,,C
+V0213,"RÁDIO, EXISTÊNCIA: 1- Sim 2- Não Branco",94,94,1,,C
+V0214,"TELEVISÃO, EXISTÊNCIA: 1- Sim 2- Não Branco",95,95,1,,C
+V0215,"MÁQUINA DE LAVAR ROUPA, EXISTÊNCIA: 1- Sim 2- Não Branco",96,96,1,,C
+V0216,"GELADEIRA, EXISTÊNCIA: 1- Sim 2- Não Branco",97,97,1,,C
+V0217,"TELEFONE CELULAR, EXISTÊNCIA: 1- Sim 2- Não Branco",98,98,1,,C
+V0218,"TELEFONE FIXO, EXISTÊNCIA: 1- Sim 2- Não Branco",99,99,1,,C
+V0219,"MICROCOMPUTADOR, EXISTÊNCIA: 1- Sim 2- Não Branco",100,100,1,,C
+V0220,"MICROCOMPUTADOR COM ACESSO À INTERNET, EXISTÊNCIA: 1- Sim 2- Não Branco",101,101,1,,C
+V0221,"MOTOCICLETA PARA USO PARTICULAR, EXISTÊNCIA: 1- Sim 2- Não Branco",102,102,1,,C
+V0222,"AUTOMÓVEL PARA USO PARTICULAR, EXISTÊNCIA: 1- Sim 2- Não Branco",103,103,1,,C
+V0301,ALGUMA PESSOA QUE MORAVA COM VOCÊ(S) ESTAVA MORANDO EM OUTRO PAÍS EM 31 DE JULHO DE 2010: 1- Sim 2- Não Branco,104,104,1,,C
+V0401,QUANTAS PESSOAS MORAVAM NESTE DOMICÍLIO EM 31 DE JULHO DE 2010,105,106,2,,N
+V0402,A RESPONSABILIDADE PELO DOMICÍLIO É DE: 1- Apenas um morador 2- Mais de um morador 9- Ignorado Branco,107,107,1,,C
+V0701,"DE AGOSTO DE 2009 A JULHO DE 2010, FALECEU ALGUMA PESSOA QUE MORAVA COM VOCÊ(S) (INCLUSIVE CRIANÇAS RECÉM-NASCIDAS E IDOSOS): 1- Sim 2- Não Branco",108,108,1,,C
+V6529,RENDIMENTO MENSAL DOMICILIAR EM JULHO DE 2010,109,115,7,,N
+V6530,"RENDIMENTO DOMICILIAR, SALÁRIOS MÍNIMOS, EM JULHO DE 2010",116,125,5,5,N
+V6531,RENDIMENTO DOMICILIAR PER CAPITA EM JULHO DE 2010,126,133,6,2,N
+V6532,"RENDIMENTO DOMICILIAR PER CAPITA, EM Nº DE SALÁRIOS MÍNIMOS, EM JULHO DE 2010",134,142,4,5,N
+V6600,Espécie da Unidade Doméstica 1- Unipessoal 2- Nuclear 3- Estendida 4- Composta Branco (Domicílio Coletivo),143,143,1,,C
+V6210,ADEQUAÇÃO DA MORADIA 1-  2-  3-  Branco,144,144,1,,C
+M0201,MARCA DE IMPUTAÇÃO NA V0201: 1- Sim 2- Não,145,145,1,,C
+M2011,MARCA DE IMPUTAÇÃO NA V2011: 1- Sim 2- Não,146,146,1,,C
+M0202,MARCA DE IMPUTAÇÃO NA V0202: 1- Sim 2- Não,147,147,1,,C
+M0203,MARCA DE IMPUTAÇÃO NA V0203: 1- Sim 2- Não,148,148,1,,C
+M0204,MARCA DE IMPUTAÇÃO NA V0204: 1- Sim 2- Não,149,149,1,,C
+M0205,MARCA DE IMPUTAÇÃO NA V0205: 1- Sim 2- Não,150,150,1,,C
+M0206,MARCA DE IMPUTAÇÃO NA V0206: 1- Sim 2- Não,151,151,1,,C
+M0207,MARCA DE IMPUTAÇÃO NA V0207: 1- Sim 2- Não,152,152,1,,C
+M0208,MARCA DE IMPUTAÇÃO NA V0208: 1- Sim 2- Não,153,153,1,,C
+M0209,MARCA DE IMPUTAÇÃO NA V0209: 1- Sim 2- Não,154,154,1,,C
+M0210,MARCA DE IMPUTAÇÃO NA V0210: 1- Sim 2- Não,155,155,1,,C
+M0211,MARCA DE IMPUTAÇÃO NA V0211: 1- Sim,156,156,1,,C
+M0212,MARCA DE IMPUTAÇÃO NA V0212: 1- Sim 2- Não,157,157,1,,C
+M0213,MARCA DE IMPUTAÇÃO NA V0213: 1- Sim 2- Não,158,158,1,,C
+M0214,MARCA DE IMPUTAÇÃO NA V0214: 1- Sim 2- Não,159,159,1,,C
+M0215,MARCA DE IMPUTAÇÃO NA V0215: 1- Sim 2- Não,160,160,1,,C
+M0216,MARCA DE IMPUTAÇÃO NA V0216: 1- Sim 2- Não,161,161,1,,C
+M0217,MARCA DE IMPUTAÇÃO NA V0217: 1- Sim 2- Não,162,162,1,,C
+M0218,MARCA DE IMPUTAÇÃO NA V0218: 1- Sim 2- Não,163,163,1,,C
+M0219,MARCA DE IMPUTAÇÃO NA V0219: 1- Sim 2- Não,164,164,1,,C
+M0220,MARCA DE IMPUTAÇÃO NA V0220: 1- Sim,165,165,1,,C
+M0221,MARCA DE IMPUTAÇÃO NA V0221: 1- Sim 2- Não,166,166,1,,C
+M0222,MARCA DE IMPUTAÇÃO NA V0222: 1- Sim 2- Não,167,167,1,,C
+M0301,MARCA DE IMPUTAÇÃO NA V0301: 1- Sim 2- Não,168,168,1,,C
+M0401,MARCA DE IMPUTAÇÃO NA V0401: 1- Sim 2- Não,169,169,1,,C
+M0402,MARCA DE IMPUTAÇÃO NA V0402: 1- Sim 2- Não,170,170,1,,C
+M0701,MARCA DE IMPUTAÇÃO NA V0701: 1- Sim 2- Não,171,171,1,,C
+V1005,Situação do setor 1 - Área urbanizada 2 - Área não urbanizada 3 - Área urbanizada isolada 4 - Área rural de extensão urbana 5 - Aglomerado rural (povoado) 6 - Aglomerado rural (núcleo) 7 - Aglomerado rural (outros) 8 - Área rural exclusive aglomerado rural  1- Masculino 2- Feminino,172,172,1,,C

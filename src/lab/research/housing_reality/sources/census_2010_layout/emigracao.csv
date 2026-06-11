@@ -1,0 +1,20 @@
+variable,description,start,end,length,decimals,type
+V0001,UNIDADE DA FEDERAÇÃO: 11- Rondônia 12- Acre 13- Amazonas 14- Roraima 15- Pará 16- Amapá 17- Tocantins 21- Maranhão 22- Piauí 23- Ceará 24- Rio Grande do Norte 25- Paraíba 26- Pernambuco 27- Alagoas 28- Sergipe 29- Bahia 31- Minas Gerais 32- Espírito Santo 33- Rio de Janeiro 35- São Paulo 41- Paraná 42- Santa Catarina 43- Rio Grande do Sul 50- Mato Grosso do Sul 51- Mato Grosso 52- Goiás 53- Distrito Federal,1,2,2,,A
+V0002,CÓDIGO DO MUNICÍPIO,3,7,5,,A
+V0011,ÁREA DE PONDERAÇÃO,8,20,13,,A
+V0300,CONTROLE,21,28,8,,N
+V0010,PESO AMOSTRAL,29,44,3,13,N
+V1001,REGIÃO 1- Região norte (uf=11 a 17) 2- Região nordeste (uf=21 a 29) 3- Região sudeste (uf=31 a 33 e 35) 4- Região sul (uf=41 a 43) 5- Região centro-oeste (uf=50 a 53),45,45,1,,C
+V1002,,46,47,2,,A
+V1003,,48,50,3,,A
+V1004,A relação de códigos encontra-se no arquivo:,51,52,2,,A
+V1006,SITUAÇÃO DO DOMICÍLIO: 1- Urbana 2- Rural,53,53,1,,C
+V0303,SEXO DO EMIGRANTE: 1- Masculino 2- Feminino 9- Ignorado Branco,54,54,1,,C
+V0304,ANO DE NASCIMENTO DO EMIGRANTE: - Branco - 1869 a 2010 - 9999 = ignorado,55,58,4,,A
+V0305,ANO DA ÚLTIMA PARTIDA DO EMIGRANTE: - Branco - 1869 a 2010 - 9999 = ignorado,59,62,4,,A
+V3061,PAÍS DE RESIDÊNCIA EM 31 DE JULHO DE 2010 – CÓDIGO: - Branco - A relação de códigos encontra-se no arquivo: “Migração_Países_2010 V3061 V6224 V6256 V6266 V6366 V6606.xls”,63,69,7,,A
+M0303,MARCA DE IMPUTAÇÃO NA V0303: 1- Sim 2- Não,70,70,1,,C
+M0304,MARCA DE IMPUTAÇÃO NA V0304: 1- Sim 2- Não,71,71,1,,C
+M0305,MARCA DE IMPUTAÇÃO NA V0305: 1- Sim 2- Não,72,72,1,,C
+M3061,MARCA DE IMPUTAÇÃO NA V3061: 1- Sim 2- Não,73,73,1,,C
+V1005,Situação do setor 1 - Área urbanizada 2 - Área não urbanizada 3 - Área urbanizada isolada 4 - Área rural de extensão urbana 5 - Aglomerado rural (povoado) 6 - Aglomerado rural (núcleo) 7 - Aglomerado rural (outros) 8 - Área rural exclusive aglomerado rural  1- Masculino 2- Feminino,74,74,1,,C

@@ -1,0 +1,20 @@
+variable,description,start,end,length,decimals,type
+V0001,UNIDADE DA FEDERAÇÃO: 11- Rondônia 12- Acre 13- Amazonas 14- Roraima 15- Pará 16- Amapá 17- Tocantins 21- Maranhão 22- Piauí 23- Ceará 24- Rio Grande do Norte 25- Paraíba 26- Pernambuco 27- Alagoas 28- Sergipe 29- Bahia 31- Minas Gerais 32- Espírito Santo 33- Rio de Janeiro 35- São Paulo 41- Paraná 42- Santa Catarina 43- Rio Grande do Sul 50- Mato Grosso do Sul 51- Mato Grosso 52- Goiás 53- Distrito Federal,1,2,2,,A
+V0002,CÓDIGO DO MUNICÍPIO,3,7,5,,A
+V0011,ÁREA DE PONDERAÇÃO,8,20,13,,A
+V0300,CONTROLE,21,28,8,,N
+V0010,PESO AMOSTRAL,29,44,3,13,N
+V1001,REGIÃO GEOGRÁFICA: 1- Região norte (uf=11 a 17) 2- Região nordeste (uf=21 a 29) 3- Região sudeste (uf=31 a 33 e 35) 4- Região sul (uf=41 a 43) 5- Região centro-oeste (uf=50 a 53),45,45,1,,C
+V1002,CÓDIGO DA MESORREGIÃO: A relação de códigos encontra-se no arquivo:,46,47,2,,A
+V1003,CÓDIGO DA MICRORREGIÃO: A relação de códigos encontra-se no arquivo:,48,50,3,,A
+V1004,CÓDIGO DA REGIÃO METROPOLITANA: A relação de códigos encontra-se no arquivo:,51,52,2,,A
+V1006,SITUAÇÃO DO DOMICÍLIO: 1- Urbana 2- Rural,53,53,1,,C
+V0703,MÊS E ANO DE FALECIMENTO: 01- Agosto de 2009 02- Setembro de 2009 03- Outubro de 2009 04- Novembro de 2009 05- Dezembro de 2009 06- Janeiro de 2010 07- Fevereiro de 2010 08- Março de 2010 09- Abril de 2010 10- Maio de 2010 11- Junho de 2010 12- Julho de 2010 99- Ignorado Branco,54,55,2,,C
+V0704,SEXO DA PESSOA FALECIDA: 1- Masculino 2- Feminino 9- Ignorado Branco,56,56,1,,C
+V7051,"IDADE AO FALECER, EM ANOS: - Branco - 1 a 140 - 999 = ignorado",57,59,3,,N
+V7052,"IDADE AO FALECER, EM MESES: - Branco - 0 a 11 - 99 = ignorado",60,61,2,,N
+M0703,MARCA DE IMPUTAÇÃO NA V0703: 1- Sim 2- Não,62,62,1,,C
+M0704,MARCA DE IMPUTAÇÃO NA V0704: 1- Sim 2- Não,63,63,1,,C
+M7051,MARCA DE IMPUTAÇÃO NA V7051: 1- Sim 2- Não,64,64,1,,C
+M7052,MARCA DE IMPUTAÇÃO NA V7052: 1- Sim 2- Não,65,65,1,,C
+V1005,Situação do setor 1 - Área urbanizada 2 - Área não urbanizada 3 - Área urbanizada isolada 4 - Área rural de extensão urbana 5 - Aglomerado rural (povoado) 6 - Aglomerado rural (núcleo) 7 - Aglomerado rural (outros) 8 - Área rural exclusive aglomerado rural  1- Masculino 2- Feminino,66,66,1,,C
