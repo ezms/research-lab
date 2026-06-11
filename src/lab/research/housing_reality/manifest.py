@@ -18,4 +18,6 @@ class HousingRealityResearch(ResearchManifest):
     output_types = [OutputType.TABLE, OutputType.CHART, OutputType.NOTEBOOK]
 
     def run(self, params: BaseModel) -> dict:
-        raise NotImplementedError
+        from lab.research.housing_reality.pipeline import runner
+
+        return runner.run(HousingRealityParams.model_validate(params.model_dump()))
