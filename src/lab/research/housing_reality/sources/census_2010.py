@@ -19,8 +19,12 @@ _FILE_TYPES = {
 }
 
 
-def _to_snake(text: str) -> str:
-    name = text.split(":")[0].strip().lower()
+def _to_snake(text: object) -> str:
+    if not isinstance(text, str) or not text.strip():
+        return ""
+    # heading ends at ": " or at the start of a category list (" 1- ", " 1 - ")
+    heading = re.split(r":\s*|\s+\d+\s*[-–]\s*", text)[0].strip()
+    name = heading.lower()
     name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
     return re.sub(r"_+", "_", re.sub(r"[^a-z0-9]+", "_", name)).strip("_")
 
@@ -131,6 +135,12 @@ class Census2010DataSource(DataSource):
                 header=None,
                 encoding="latin-1",
             ).astype(dtypes)
+
+            for _, row in layout.iterrows():
+                dec_str = str(row["decimals"]).strip()
+                if dec_str and dec_str != "nan":
+                    df[row["variable"]] /= 10 ** int(float(dec_str))
+
             df.to_parquet(parquet_path, index=False, compression="snappy")
             result[name] = parquet_path
 
@@ -149,7 +159,7 @@ class Census2010DataSource(DataSource):
 
             layout = pd.read_csv(_LAYOUT_DIR / f"{name}.csv")
             rename_map = {
-                row["variable"]: _to_snake(row["description"])
+                row["variable"]: (_to_snake(row["description"]) or row["variable"].lower())
                 for _, row in layout.iterrows()
             }
 
