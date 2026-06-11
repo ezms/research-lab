@@ -2,8 +2,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 
-import pandas as pd
-
 
 @dataclass(frozen=True)
 class SourceIdentity:
@@ -27,13 +25,13 @@ class Downloadable(ABC):
 
 class Parseable(ABC):
     @abstractmethod
-    def parse(self, file_path: Path) -> dict[str, pd.DataFrame]:
+    def parse(self, file_path: Path) -> dict[str, Path]:
         pass
 
 
 class VariableMappable(ABC):
     @abstractmethod
-    def map_variables(self, raw_data: dict[str, pd.DataFrame]) -> dict[str, pd.DataFrame]:
+    def map_variables(self, parsed_data: dict[str, Path]) -> dict[str, Path]:
         pass
 
 
