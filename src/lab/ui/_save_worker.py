@@ -27,11 +27,19 @@ class SaveWorker(QThread):
             self.errored.emit(str(exc))
 
     def _persist_duckdb(self) -> None:
+        import duckdb
+
         from lab.infrastructure.database.duckdb_adapter import DuckDBAdapter
 
         db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
         db_path.parent.mkdir(parents=True, exist_ok=True)
-        db = DuckDBAdapter(db_path=db_path)
+        try:
+            db = DuckDBAdapter(db_path=db_path)
+        except duckdb.IOException:
+            raise RuntimeError(
+                "O banco está aberto em outro processo (ex: DBeaver). "
+                "Feche a conexão e tente novamente."
+            )
         for uf, files in self._results.items():
             for file_type, path in files.items():
                 table = f"{self._manifest_id}_{uf.lower()}_{file_type}"

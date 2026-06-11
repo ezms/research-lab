@@ -186,6 +186,35 @@ class OutputWidget(QWidget):
         row.addWidget(self._save_btn)
         self._root.addLayout(row)
 
+        if self._is_already_saved():
+            self._save_btn.setVisible(False)
+            self._save_label.setText("✓ Dados já persistidos.")
+
+    def _is_already_saved(self) -> bool:
+        import os
+
+        import duckdb
+
+        db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
+        if not db_path.exists():
+            return False
+        try:
+            conn = duckdb.connect(str(db_path), read_only=True)
+            for uf, files in self._results.items():
+                for file_type in files:
+                    table = f"{self._manifest_cls.id}_{uf.lower()}_{file_type}"
+                    count = conn.execute(
+                        "SELECT COUNT(*) FROM information_schema.tables "
+                        f"WHERE table_name = '{table}'"
+                    ).fetchone()[0]
+                    if count == 0:
+                        conn.close()
+                        return False
+            conn.close()
+            return True
+        except Exception:
+            return False
+
     def _save_data(self) -> None:
         self._save_btn.setEnabled(False)
         self._save_btn.setText("Salvando…")
