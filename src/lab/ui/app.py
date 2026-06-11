@@ -18,7 +18,10 @@ class MainWindow(QMainWindow):
 
         from lab.ui.catalog import CatalogWidget
 
-        self._catalog = CatalogWidget(on_select=self._open_form)
+        self._catalog = CatalogWidget(
+            on_select=self._open_form,
+            on_view=self._view_direct,
+        )
         self._stack.addWidget(self._catalog)
 
     def _open_form(self, manifest_cls: type[ResearchManifest]) -> None:
@@ -30,6 +33,18 @@ class MainWindow(QMainWindow):
             on_back=lambda: self._stack.setCurrentWidget(self._catalog),
         )
         self._push(form)
+
+    def _view_direct(self, manifest_cls: type[ResearchManifest]) -> None:
+        from lab.ui.output import OutputWidget
+
+        params = manifest_cls.params_model()
+        out = OutputWidget(
+            manifest_cls=manifest_cls,
+            params=params,
+            output_type=manifest_cls.output_types[0],
+            on_back=lambda: self._stack.setCurrentWidget(self._catalog),
+        )
+        self._push(out)
 
     def _run_research(
         self,

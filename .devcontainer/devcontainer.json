@@ -20,6 +20,7 @@
     "source=research-lab-uv-cache,target=/home/dev/.cache/uv,type=volume",
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
   ],
+  "forwardPorts": [8501],
   "postCreateCommand": "sudo chown -R dev:dev /home/dev/.cache/uv && uv sync --all-extras || true",
   "customizations": {
     "vscode": {

@@ -19,6 +19,10 @@ class ResearchManifest(ABC):
     params_model: ClassVar[type[BaseModel]]
     output_types: ClassVar[list[OutputType]]
 
+    @classmethod
+    def local_results(cls, params: BaseModel) -> "dict | None":
+        return None
+
     @abstractmethod
     def run(self, params: BaseModel) -> dict:
         pass

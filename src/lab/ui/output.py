@@ -1,18 +1,18 @@
 import json
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from typing import Callable
 
 import pandas as pd
 from pydantic import BaseModel
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtCore import Qt, QThread, QTimer, Signal
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
-    QProgressBar,
     QPushButton,
     QScrollArea,
     QTableView,
@@ -41,22 +41,70 @@ class _RenderWorker(QThread):
         self._output_type = output_type
 
     def run(self) -> None:
+        import duckdb
+
         try:
             if self._output_type == OutputType.TABLE:
-                data = {
-                    uf: {ft: pd.read_parquet(path) for ft, path in files.items()}
-                    for uf, files in self._results.items()
-                }
+                data: dict = {}
+                for uf, files in self._results.items():
+                    data[uf] = {}
+                    for ft, path in files.items():
+                        data[uf][ft] = duckdb.execute(
+                            f"SELECT * FROM read_parquet('{path}') LIMIT 500"
+                        ).df()
                 self.table_ready.emit(data)
             elif self._output_type == OutputType.CHART:
                 ufs, counts = [], []
                 for uf, files in self._results.items():
                     if "domicilios" in files:
+                        path = files["domicilios"]
+                        count = duckdb.execute(
+                            f"SELECT COUNT(*) FROM read_parquet('{path}')"
+                        ).fetchone()[0]
                         ufs.append(uf)
-                        counts.append(len(pd.read_parquet(files["domicilios"])))
+                        counts.append(count)
                 self.chart_ready.emit(ufs, counts)
         except Exception as exc:
             self.errored.emit(str(exc))
+
+class _CheckSavedWorker(QThread):
+    result: Signal = Signal(bool)
+
+    def __init__(self, manifest_id: str, results: dict[str, dict[str, Path]]) -> None:
+        super().__init__()
+        self._manifest_id = manifest_id
+        self._results = results
+
+    def run(self) -> None:
+        import os
+        import duckdb
+
+        try:
+            token = os.environ.get("MOTHERDUCK_TOKEN")
+            if token:
+                conn = duckdb.connect(f"md:research?motherduck_token={token}")
+            else:
+                db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
+                if not db_path.exists():
+                    self.result.emit(False)
+                    return
+                conn = duckdb.connect(str(db_path), read_only=True)
+            for uf, files in self._results.items():
+                for file_type in files:
+                    table = f"{self._manifest_id}_{uf.lower()}_{file_type}"
+                    count = conn.execute(
+                        "SELECT COUNT(*) FROM information_schema.tables "
+                        f"WHERE table_name = '{table}'"
+                    ).fetchone()[0]
+                    if count == 0:
+                        conn.close()
+                        self.result.emit(False)
+                        return
+            conn.close()
+            self.result.emit(True)
+        except Exception:
+            self.result.emit(False)
+
 
 _BTN_BACK_STYLE = """
     QPushButton {
@@ -119,7 +167,18 @@ class OutputWidget(QWidget):
         self._worker: ResearchWorker | None = None
         self._render_worker: _RenderWorker | None = None
         self._save_worker: SaveWorker | None = None
+        self._check_saved_worker: _CheckSavedWorker | None = None
         self._results: dict = {}
+        self._anim_value: int = 0
+        self._anim_dir: int = 1
+        self._anim_timer = QTimer(self)
+        self._anim_timer.setInterval(500)
+        self._anim_timer.timeout.connect(self._tick_progress)
+        self._collect_proc: subprocess.Popen | None = None
+        self._poll_timer = QTimer(self)
+        self._poll_timer.setInterval(1000)
+        self._poll_timer.timeout.connect(self._check_collection)
+        self._params = params
         self._build()
         self._start(params)
 
@@ -144,19 +203,12 @@ class OutputWidget(QWidget):
         title.setFont(font)
         self._root.addWidget(title)
 
-        self._status = QLabel("Executando pesquisa…")
+        self._status_base = "Executando pesquisa"
+        self._status = QLabel(self._status_base + "…")
         self._status.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._root.addWidget(self._status, 1)
 
-        self._progress = QProgressBar()
-        self._progress.setRange(0, 0)  # indeterminate
-        self._progress.setTextVisible(False)
-        self._progress.setFixedHeight(4)
-        self._progress.setStyleSheet(
-            "QProgressBar { background: #313244; border: none; border-radius: 2px; }"
-            "QProgressBar::chunk { background: #89b4fa; border-radius: 2px; }"
-        )
-        self._root.addWidget(self._progress)
+        self._anim_timer.start()
 
         self._cancel_btn = QPushButton("Interromper")
         self._cancel_btn.setStyleSheet(_BTN_CANCEL_STYLE)
@@ -164,18 +216,81 @@ class OutputWidget(QWidget):
         self._cancel_btn.clicked.connect(self._cancel)
         self._root.addWidget(self._cancel_btn, 0, Qt.AlignmentFlag.AlignCenter)
 
+    def _tick_progress(self) -> None:
+        self._anim_value = (self._anim_value + 1) % 4
+        dots = "." * self._anim_value
+        self._status.setText(self._status_base + dots)
+
+    def _stop_progress(self) -> None:
+        self._anim_timer.stop()
+
     def _start(self, params: BaseModel) -> None:
-        self._worker = ResearchWorker(self._manifest_cls, params)
-        self._worker.finished.connect(self._on_finished)
-        self._worker.errored.connect(self._on_error)
-        self._worker.start()
+        local = self._manifest_cls.local_results(params)
+        if local:
+            self._stop_progress()
+            self._on_finished(local)
+        else:
+            self._show_collect_prompt()
+
+    def _show_collect_prompt(self) -> None:
+        self._stop_progress()
+        self._cancel_btn.setVisible(False)
+        self._status.setText("Dados não coletados para as UFs selecionadas.")
+        collect_btn = QPushButton("Coletar em background")
+        collect_btn.setStyleSheet(_BTN_SAVE_STYLE)
+        collect_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        collect_btn.clicked.connect(lambda: self._start_background_collection(collect_btn))
+        self._root.addWidget(collect_btn, 0, Qt.AlignmentFlag.AlignCenter)
+
+    def _start_background_collection(self, collect_btn: QPushButton) -> None:
+        collect_btn.setVisible(False)
+        payload = json.dumps({
+            "manifest": f"{self._manifest_cls.__module__}:{self._manifest_cls.__qualname__}",
+            "params": self._params.model_dump(mode="json"),
+        }).encode()
+        self._collect_proc = subprocess.Popen(
+            [sys.executable, "-m", "lab.ui._pipeline_runner"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+        )
+        self._collect_proc.stdin.write(payload)
+        self._collect_proc.stdin.close()
+        self._status_base = "Coletando dados em background"
+        self._status.setText(self._status_base + "…")
+        self._status.setStyleSheet("color: #cdd6f4;")
+        hint = QLabel("Você pode navegar livremente — os dados estarão disponíveis ao voltar.")
+        hint.setStyleSheet("color: #6c7086; font-size: 11px;")
+        hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._root.addWidget(hint)
+        self._anim_timer.start()
+        self._poll_timer.start()
+
+    def _check_collection(self) -> None:
+        if self._collect_proc is None or self._collect_proc.poll() is None:
+            return
+        self._poll_timer.stop()
+        self._stop_progress()
+        if self._collect_proc.returncode == 0:
+            local = self._manifest_cls.local_results(self._params)
+            if local:
+                self._on_finished(local)
+            else:
+                self._status.setText("Coleta concluída mas dados não encontrados.")
+        else:
+            err = self._collect_proc.stderr.read().decode()
+            self._status.setText(f"Erro na coleta: {err}")
+            self._status.setStyleSheet("color: #f38ba8;")
 
     def _cancel(self) -> None:
         if self._worker and self._worker.isRunning():
             self._worker.terminate()
         if self._render_worker and self._render_worker.isRunning():
             self._render_worker.terminate()
-        self._progress.setVisible(False)
+        if self._collect_proc and self._collect_proc.poll() is None:
+            self._collect_proc.terminate()
+        self._poll_timer.stop()
+        self._stop_progress()
         self._cancel_btn.setVisible(False)
         self._status.setText("Processo interrompido.")
 
@@ -183,12 +298,13 @@ class OutputWidget(QWidget):
         self._results = results
 
         if self._output_type == OutputType.NOTEBOOK:
-            self._progress.setVisible(False)
+            self._stop_progress()
             self._cancel_btn.setVisible(False)
             self._open_notebook(results)
             return
 
-        self._status.setText("Preparando visualização…")
+        self._status_base = "Preparando visualização"
+        self._status.setText(self._status_base + "…")
         self._render_worker = _RenderWorker(results, self._output_type)
         self._render_worker.table_ready.connect(self._on_table_ready)
         self._render_worker.chart_ready.connect(self._on_chart_ready)
@@ -196,7 +312,7 @@ class OutputWidget(QWidget):
         self._render_worker.start()
 
     def _on_table_ready(self, data: object) -> None:
-        self._progress.setVisible(False)
+        self._stop_progress()
         self._cancel_btn.setVisible(False)
         self._root.removeWidget(self._status)
         self._status.deleteLater()
@@ -204,7 +320,7 @@ class OutputWidget(QWidget):
         self._add_save_row()
 
     def _on_chart_ready(self, ufs: list, counts: list) -> None:
-        self._progress.setVisible(False)
+        self._stop_progress()
         self._cancel_btn.setVisible(False)
         self._root.removeWidget(self._status)
         self._status.deleteLater()
@@ -212,7 +328,7 @@ class OutputWidget(QWidget):
         self._add_save_row()
 
     def _on_error(self, message: str) -> None:
-        self._progress.setVisible(False)
+        self._stop_progress()
         self._cancel_btn.setVisible(False)
         self._status.setText(f"Erro: {message}")
         self._status.setStyleSheet("color: #f38ba8;")
@@ -233,38 +349,16 @@ class OutputWidget(QWidget):
         row.addWidget(self._save_btn)
         self._root.addLayout(row)
 
-        if self._is_already_saved():
+        self._check_saved_worker = _CheckSavedWorker(
+            self._manifest_cls.id, self._results
+        )
+        self._check_saved_worker.result.connect(self._on_saved_check)
+        self._check_saved_worker.start()
+
+    def _on_saved_check(self, already_saved: bool) -> None:
+        if already_saved:
             self._save_btn.setVisible(False)
             self._save_label.setText("✓ Dados já persistidos.")
-
-    def _is_already_saved(self) -> bool:
-        import os
-
-        import duckdb
-
-        try:
-            token = os.environ.get("MOTHERDUCK_TOKEN")
-            if token:
-                conn = duckdb.connect(f"md:research?motherduck_token={token}")
-            else:
-                db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
-                if not db_path.exists():
-                    return False
-                conn = duckdb.connect(str(db_path), read_only=True)
-            for uf, files in self._results.items():
-                for file_type in files:
-                    table = f"{self._manifest_cls.id}_{uf.lower()}_{file_type}"
-                    count = conn.execute(
-                        "SELECT COUNT(*) FROM information_schema.tables "
-                        f"WHERE table_name = '{table}'"
-                    ).fetchone()[0]
-                    if count == 0:
-                        conn.close()
-                        return False
-            conn.close()
-            return True
-        except Exception:
-            return False
 
     def _save_data(self) -> None:
         self._save_btn.setEnabled(False)
