@@ -1,10 +1,9 @@
-from dotenv import load_dotenv
-
-load_dotenv()
-
-import lab.research.housing_reality.manifest  # noqa: F401 — populates research registry
-
-from lab.ui.app import run
+import subprocess
+import sys
 
 if __name__ == "__main__":
-    run()
+    subprocess.run([
+        sys.executable, "-m", "streamlit", "run",
+        "src/lab/ui/streamlit_app.py",
+        "--server.headless", "true",
+    ])

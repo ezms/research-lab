@@ -75,9 +75,7 @@ def view_catalog() -> None:
                 elif local:
                     ufs = sorted(local.keys())
                     all_key = f"all_ufs_{manifest_id}"
-                    if all_key not in st.session_state:
-                        st.session_state[all_key] = True
-                    todas = st.checkbox("Todas as UFs", value=st.session_state[all_key], key=all_key)
+                    todas = st.checkbox("Todas as UFs", value=True, key=all_key)
                     if todas:
                         selected = ufs
                         st.caption(f"{len(ufs)} UF(s) coletadas")
