@@ -1,7 +1,10 @@
+import zipfile
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
-from lab.research.housing_reality.sources.census_2010 import _fwf_params, _to_snake
+from lab.research.housing_reality.sources.census_2010 import _fwf_params, _is_valid_zip, _to_snake
 
 
 class TestToSnake:
@@ -78,3 +81,21 @@ class TestFwfParams:
         layout = self._layout([["V0010", "PESO", "29", "44", "3", "13", "N"]])
         _, _, dtypes = _fwf_params(layout)
         assert dtypes["V0010"] == "Float64"
+
+
+class TestIsValidZip:
+    def test_valid_zip_returns_true(self, tmp_path: Path):
+        path = tmp_path / "ok.zip"
+        with zipfile.ZipFile(path, "w") as z:
+            z.writestr("file.txt", "content")
+        assert _is_valid_zip(path) is True
+
+    def test_truncated_file_returns_false(self, tmp_path: Path):
+        path = tmp_path / "bad.zip"
+        path.write_bytes(b"PK\x03\x04truncated garbage")
+        assert _is_valid_zip(path) is False
+
+    def test_empty_file_returns_false(self, tmp_path: Path):
+        path = tmp_path / "empty.zip"
+        path.write_bytes(b"")
+        assert _is_valid_zip(path) is False

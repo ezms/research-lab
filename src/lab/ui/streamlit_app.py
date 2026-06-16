@@ -34,6 +34,20 @@ def _local(manifest_cls) -> dict | None:
     return manifest_cls.local_results(manifest_cls.params_model())
 
 
+def _save(manifest_cls) -> None:
+    from lab.infrastructure.research.duckdb_repository import make_repository
+    local = _local(manifest_cls)
+    if not local:
+        return
+    repo = make_repository()
+    items = [(uf, ft, path) for uf, files in local.items() for ft, path in files.items()]
+    bar = st.progress(0, text="Salvando…")
+    for idx, (uf, ft, path) in enumerate(items):
+        bar.progress((idx + 1) / len(items), text=f"Salvando {uf}/{ft}…")
+        repo.save(manifest_cls.id, uf, ft, path)
+    bar.empty()
+
+
 def _start_collection(manifest_cls) -> None:
     payload = json.dumps({
         "manifest": f"{manifest_cls.__module__}:{manifest_cls.__qualname__}",
@@ -55,10 +69,10 @@ def _start_collection(manifest_cls) -> None:
 def view_catalog() -> None:
     st.title("Research Lab")
 
-    # Check finished collections
     for mid, proc in list(st.session_state.collect_procs.items()):
         if proc.poll() is not None:
             del st.session_state.collect_procs[mid]
+
 
     cols = st.columns(3, gap="large")
     for i, (manifest_id, manifest_cls) in enumerate(registry.items()):
@@ -85,7 +99,7 @@ def view_catalog() -> None:
                             selected = ufs
                     st.session_state[f"selected_ufs_{manifest_id}"] = selected
 
-                c1, c2 = st.columns(2)
+                c1, c2, c3 = st.columns(3)
                 with c1:
                     if local and st.button("Visualizar", key=f"v_{manifest_id}", type="primary", use_container_width=True):
                         st.session_state.view = "explore"
@@ -96,6 +110,9 @@ def view_catalog() -> None:
                     if not collecting and st.button(label, key=f"c_{manifest_id}", use_container_width=True):
                         _start_collection(manifest_cls)
                         st.rerun()
+                with c3:
+                    if local and st.button("Salvar", key=f"s_{manifest_id}", use_container_width=True):
+                        _save(manifest_cls)
 
     if st.session_state.collect_procs:
         time.sleep(2)
