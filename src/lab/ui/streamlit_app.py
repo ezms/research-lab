@@ -41,11 +41,15 @@ def _save(manifest_cls) -> None:
         return
     repo = make_repository()
     items = [(uf, ft, path) for uf, files in local.items() for ft, path in files.items()]
-    bar = st.progress(0, text="Salvando…")
+    total = len(items)
+    bar = st.progress(0, text="Conectando…")
+    status = st.empty()
     for idx, (uf, ft, path) in enumerate(items):
-        bar.progress((idx + 1) / len(items), text=f"Salvando {uf}/{ft}…")
+        status.caption(f"Salvando {uf}/{ft} ({idx + 1}/{total})…")
         repo.save(manifest_cls.id, uf, ft, path)
+        bar.progress((idx + 1) / total)
     bar.empty()
+    status.empty()
 
 
 def _start_collection(manifest_cls) -> None:
