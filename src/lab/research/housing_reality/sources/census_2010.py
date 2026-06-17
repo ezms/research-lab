@@ -1,3 +1,4 @@
+import logging
 import re
 import unicodedata
 import zipfile
@@ -9,8 +10,9 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from lab.enums.uf import UF
-from lab.platform.data_source.contract import DataSource, SourceIdentity
+from lab.research.housing_reality.domain.ports import HousingDataSource
 
+_log = logging.getLogger(__name__)
 _LAYOUT_DIR = Path(__file__).parent / "census_2010_layout"
 
 _FILE_TYPES = {
@@ -74,26 +76,16 @@ def _fwf_params(
     return colspecs, names, dtypes
 
 
-class Census2010DataSource(DataSource):
+class Census2010DataSource(HousingDataSource):
     BASE_URL = (
         "https://ftp.ibge.gov.br/Censos/Censo_Demografico_2010"
         "/Resultados_Gerais_da_Amostra/Microdados"
     )
     MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024
 
-    def __init__(self, uf: UF, work_dir: Path) -> None:
+    def __init__(self, work_dir: Path, uf: UF | None = None) -> None:
         self._uf = uf
-        self._work_dir = work_dir
-
-    def identify(self) -> SourceIdentity:
-        return SourceIdentity(
-            name="Censo Demográfico",
-            version="2010",
-            provider="IBGE",
-            description=(
-                f"Microdados da Amostra do Censo Demográfico 2010 para a UF {self._uf.value}"
-            ),
-        )
+        self._work_dir = work_dir / "census_2010" if uf is None else work_dir
 
     def _download_zip(self, stem: str) -> Path:
         output_path = self._work_dir / f"{stem}.zip"
@@ -228,3 +220,29 @@ class Census2010DataSource(DataSource):
             result[name] = mapped_path
 
         return result
+
+
+    def collect(self, params) -> dict[str, dict[str, Path]]:
+        ufs = params.ufs or list(UF)
+        results: dict[str, dict[str, Path]] = {}
+        for uf in ufs:
+            try:
+                source = Census2010DataSource(work_dir=self._work_dir, uf=uf)
+                zip_path = source.download()
+                parsed = source.parse(zip_path)
+                results[uf.value] = source.map_variables(parsed)
+            except Exception as exc:
+                _log.error("UF %s falhou: %s", uf.value, exc)
+        return results
+
+    def find_local(self, params) -> dict[str, dict[str, Path]] | None:
+        ufs = params.ufs or list(UF)
+        results: dict[str, dict[str, Path]] = {}
+        for uf in ufs:
+            mapped_dir = self._work_dir / uf.value / "mapped"
+            if not mapped_dir.exists():
+                continue
+            files = {p.stem: p for p in sorted(mapped_dir.glob("*.parquet"))}
+            if files:
+                results[uf.value] = files
+        return results or None

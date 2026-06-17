@@ -2,41 +2,40 @@ import logging
 import os
 from pathlib import Path
 
-from lab.enums.uf import UF
+from lab.research.housing_reality.domain.ports import HousingDataSource
 from lab.research.housing_reality.params import HousingRealityParams
 from lab.research.housing_reality.sources.census_2010 import Census2010DataSource
+from lab.research.housing_reality.sources.pnadc_visita1 import PNADCVisita1DataSource
 
 _log = logging.getLogger(__name__)
 
+_SOURCES: list[type[HousingDataSource]] = [
+    Census2010DataSource,
+    PNADCVisita1DataSource,
+]
+
+
+def _work_dir() -> Path:
+    return Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data"))
+
 
 def find_local_results(params: HousingRealityParams) -> dict[str, dict[str, Path]] | None:
-    """Returns mapped parquet paths for whichever requested UFs exist locally.
-    Returns None only if no UF has local data at all."""
-    work_dir = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "census_2010"
-    ufs = params.ufs or list(UF)
     results: dict[str, dict[str, Path]] = {}
-    for uf in ufs:
-        mapped_dir = work_dir / uf.value / "mapped"
-        if not mapped_dir.exists():
-            continue
-        files = {p.stem: p for p in mapped_dir.glob("*.parquet")}
-        if files:
-            results[uf.value] = files
+    for SourceClass in _SOURCES:
+        local = SourceClass(_work_dir()).find_local(params)
+        if local:
+            for uf, files in local.items():
+                results.setdefault(uf, {}).update(files)
     return results or None
 
 
 def run(params: HousingRealityParams) -> dict[str, dict[str, Path]]:
-    work_dir = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "census_2010"
-    ufs = params.ufs or list(UF)
     results: dict[str, dict[str, Path]] = {}
-
-    for uf in ufs:
+    for SourceClass in _SOURCES:
         try:
-            source = Census2010DataSource(uf=uf, work_dir=work_dir)
-            zip_path = source.download()
-            parsed = source.parse(zip_path)
-            results[uf.value] = source.map_variables(parsed)
+            source_results = SourceClass(_work_dir()).collect(params)
+            for uf, files in source_results.items():
+                results.setdefault(uf, {}).update(files)
         except Exception as exc:
-            _log.error("UF %s falhou: %s", uf.value, exc)
-
+            _log.error("%s falhou: %s", SourceClass.__name__, exc)
     return results

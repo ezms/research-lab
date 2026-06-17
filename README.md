@@ -6,37 +6,50 @@ The first research hosted here is **housing reality in Brazil**, collecting Cens
 
 ## Architecture
 
+The project combines three patterns:
+
+- **Vertical Slice Architecture** — each research is a self-contained slice under `research/`. Slices do not share domain logic with each other.
+- **Hexagonal (Port/Adapter)** — within each slice, the runner depends on a port (interface), not on concrete sources. Adding a new data source means implementing the port; the runner does not change.
+- **DDD vocabulary inside slices** — each slice may have a `domain/` sub-package that declares its own ports and domain types. This keeps slice-specific abstractions out of the platform layer.
+
 ```
 src/lab/
-├── platform/                    # shared capabilities
-│   ├── data_source/contract.py  # DataSource protocol (identify, download, parse, map_variables)
-│   ├── research/manifest.py     # ResearchManifest base class
-│   ├── research/registry.py     # research registry
-│   └── storage/                 # database and object storage ports
+├── platform/                        # shared infrastructure (no domain logic)
+│   ├── data_source/contract.py      # Identifiable, Downloadable, SourceIdentity
+│   ├── research/manifest.py         # ResearchManifest base class
+│   ├── research/registry.py         # research registry
+│   └── storage/                     # DuckDB / MotherDuck ports
 └── research/
-    └── housing_reality/         # vertical slice
-        ├── sources/             # DataSource adapters (Census 2010)
-        ├── pipeline/            # orchestrates sources → parquet
-        ├── domain/              # domain types and rules
-        └── manifest.py          # registers the research
+    └── housing_reality/             # vertical slice
+        ├── domain/
+        │   └── ports.py             # HousingDataSource port (the slice's own abstraction)
+        ├── sources/                 # adapters that implement HousingDataSource
+        │   ├── census_2010.py       # Census Demográfico 2010 (per-UF, IBGE FTP)
+        │   └── pnadc_visita1.py     # PNADC Anual Visita 1 (national file, split by UF)
+        ├── pipeline/
+        │   └── runner.py            # iterates _SOURCES, knows nothing source-specific
+        ├── params.py                # HousingRealityParams (ufs filter, pnadc_year)
+        └── manifest.py              # registers the research in the catalog
 ```
 
-Each `DataSource` implements four steps:
+### HousingDataSource port
 
-| Method | Input | Output |
-|---|---|---|
-| `identify()` | — | `SourceIdentity` (name, version, provider) |
-| `download()` | — | `Path` to raw file |
-| `parse(file_path)` | raw file | `dict[str, Path]` to typed parquets |
-| `map_variables(parsed)` | typed parquets | `dict[str, Path]` to named parquets |
+Every data source in `housing_reality` implements two methods:
+
+| Method | Returns |
+|---|---|
+| `collect(params)` | `dict[str, dict[str, Path]]` — `{uf: {file_type: parquet_path}}` |
+| `find_local(params)` | same shape, or `None` if nothing collected yet |
+
+The runner iterates `_SOURCES: list[type[HousingDataSource]]`. To add a new source, implement the port and append the class to that list — no other file changes.
 
 Intermediate data is always stored as Parquet (Snappy-compressed). Steps are idempotent — if the output already exists the step is skipped.
 
 ## Research catalog
 
-| ID | Name | Source | Status |
+| ID | Name | Sources | Status |
 |---|---|---|---|
-| `housing_reality` | Realidade Habitacional | IBGE — Censo Demográfico 2010 | active |
+| `housing_reality` | Realidade Habitacional | Censo Demográfico 2010 · PNADC Anual Visita 1 | active |
 
 See [docs/researches/housing_reality.md](docs/researches/housing_reality.md) for detailed variable documentation.
 
@@ -97,9 +110,21 @@ uv sync --all-extras
 uv run pytest
 ```
 
+### Adding a new data source to an existing research
+
+Example: adding Census 2022 to `housing_reality`.
+
+1. Create `src/lab/research/housing_reality/sources/census_2022.py`.
+2. Implement `HousingDataSource` — define `collect(params)` and `find_local(params)`.
+3. Append the class to `_SOURCES` in `housing_reality/pipeline/runner.py`.
+
+That's it. `manifest.py`, `params.py`, and the runner loop do not change.
+
 ### Adding a new research
 
-1. Create `src/lab/research/<id>/` with `manifest.py`, `params.py`, `sources/`, `pipeline/`.
-2. Implement `DataSource` for each source.
-3. Register the manifest with `@register_research` on a subclass of `ResearchManifest`.
-4. Import the manifest module somewhere at startup (e.g. in `streamlit_app.py`) so it registers itself.
+1. Create `src/lab/research/<id>/` with `manifest.py`, `params.py`, `sources/`, `pipeline/`, and `domain/ports.py`.
+2. Define the slice's own port in `domain/ports.py` (equivalent of `HousingDataSource`).
+3. Implement the port for each data source under `sources/`.
+4. Write a runner that iterates over registered sources via the port.
+5. Register the manifest with `@register_research` on a subclass of `ResearchManifest`.
+6. Import the manifest at startup (e.g. in `streamlit_app.py`) so it registers itself.

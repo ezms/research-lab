@@ -82,3 +82,9 @@ omit = [
 [tool.coverage.report]
 fail_under = 80
 show_missing = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+]

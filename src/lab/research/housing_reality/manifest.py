@@ -11,8 +11,8 @@ class HousingRealityResearch(ResearchManifest):
     name = "Realidade Habitacional"
     description = (
         "Analisa condições habitacionais brasileiras a partir dos microdados "
-        "do Censo Demográfico 2010, cruzando configuração física dos domicílios "
-        "com composição dos moradores."
+        "do Censo Demográfico 2010 e da PNADC Anual Visita 1, cruzando configuração "
+        "física dos domicílios com composição dos moradores."
     )
     params_model = HousingRealityParams
     output_types = [OutputType.TABLE, OutputType.CHART, OutputType.NOTEBOOK]

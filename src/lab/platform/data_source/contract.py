@@ -21,19 +21,3 @@ class Downloadable(ABC):
     @abstractmethod
     def download(self) -> Path:
         pass
-
-
-class Parseable(ABC):
-    @abstractmethod
-    def parse(self, file_path: Path) -> dict[str, Path]:
-        pass
-
-
-class VariableMappable(ABC):
-    @abstractmethod
-    def map_variables(self, parsed_data: dict[str, Path]) -> dict[str, Path]:
-        pass
-
-
-class DataSource(Identifiable, Downloadable, Parseable, VariableMappable):
-    """Full data source contract: identifies, downloads, parses and maps."""

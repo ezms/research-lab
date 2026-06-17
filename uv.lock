@@ -2270,6 +2270,12 @@ qt = [
     { name = "pyside6" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "boto3", specifier = ">=1.35.0" },
@@ -2291,6 +2297,12 @@ requires-dist = [
     { name = "streamlit", specifier = ">=1.35.0" },
 ]
 provides-extras = ["qt", "dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=9.0.3" },
+    { name = "pytest-cov", specifier = ">=7.1.0" },
+]
 
 [[package]]
 name = "rfc3339-validator"

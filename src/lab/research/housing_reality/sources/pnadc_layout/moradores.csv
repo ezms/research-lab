@@ -1,0 +1,46 @@
+variable,description,start,end,length,decimals,type
+Ano,Ano de referência,1,4,4,,C
+UF,Unidade da Federação,6,7,2,,C
+V1022,Tipo de situação da região,32,32,1,,C
+V1023,Tipo de área,33,33,1,,C
+V1032,Peso com calibração,58,72,15,,N
+V2001,Número de pessoas no domicílio,88,89,2,,N
+V2003,Número de ordem,90,91,2,,C
+V2005,Condição no domicílio,92,93,2,,C
+V2007,Sexo,94,94,1,,C
+V2009,Idade na data de referência,103,105,3,,N
+V2010,Cor ou raça,106,106,1,,C
+S01001,Tipo de domicílio,453,453,1,,C
+S01002,Material predominante das paredes externas,454,454,1,,C
+S01003,Material predominante da cobertura,455,455,1,,C
+S01004,Material predominante do piso,456,456,1,,C
+S01005,Número de cômodos,457,458,2,,N
+S01006,Número de dormitórios,459,460,2,,N
+S01007,Principal forma de abastecimento de água,461,461,1,,C
+S01008,Frequência de disponibilidade da água de rede,463,463,1,,C
+S01009,Possui reservatório ou cisterna,464,464,1,,C
+S01011A,Número de banheiros exclusivos dos moradores,466,467,2,,N
+S01011C,Usa sanitário ou buraco para dejeções,470,470,1,,C
+S01012A,Destino do esgoto do banheiro,471,471,1,,C
+S01013,Destino do lixo,472,472,1,,C
+S01014,Origem da energia elétrica,473,473,1,,C
+S01015,Frequência de disponibilidade da energia elétrica,476,476,1,,C
+S01016B,Combustível mais utilizado na preparação dos alimentos,483,483,1,,C
+S01017,Condição de ocupação do domicílio,484,484,1,,C
+S01019,Valor do aluguel mensal,493,500,8,,N
+S01020,Terreno próprio,501,501,1,,C
+S01021,Número de moradores com telefone celular,503,504,2,,N
+S01023,Domicílio possui geladeira,506,506,1,,C
+S01024,Domicílio possui máquina de lavar roupa,507,507,1,,C
+S01029,Acessa à internet,511,511,1,,C
+S01031,Possui automóvel ou motocicleta de uso pessoal,512,512,1,,C
+VD2002,Condição no domicílio derivada,515,516,2,,C
+VD2003,Número de componentes do arranjo domiciliar,517,518,2,,N
+VD2004,Espécie da unidade doméstica,519,519,1,,C
+VD3004,Nível de instrução mais elevado,522,522,1,,C
+VD3005,Anos de estudo,523,524,2,,C
+VD4001,Condição em relação à força de trabalho,526,526,1,,C
+VD4002,Condição de ocupação,527,527,1,,C
+VD4019,Rendimento habitual de todos os trabalhos mensal,560,567,8,,N
+VD5007,Rendimento habitual domiciliar mensal,659,666,8,,N
+VD5008,Rendimento habitual domiciliar per capita mensal,667,674,8,,N
