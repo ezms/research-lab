@@ -4,7 +4,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from lab.research.housing_reality.sources.census_2010 import _fwf_params, _is_valid_zip, _to_snake
+from lab.research.housing_reality.sources._utils import _is_valid_zip
+from lab.research.housing_reality.sources.census_2010 import _fwf_params, _to_snake
 
 
 class TestToSnake:

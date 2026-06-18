@@ -18,23 +18,22 @@ def data_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return tmp_path
 
 
-@pytest.fixture(autouse=True)
-def no_pnadc_network(monkeypatch: pytest.MonkeyPatch):
-    """Prevent PNADC source from making network calls in runner tests."""
-    stub = MagicMock()
-    stub.return_value.collect.return_value = {}
-    stub.return_value.find_local.return_value = None
-    monkeypatch.setattr(runner, "_SOURCES", [runner._SOURCES[0], stub])
-
-
 def test_run_returns_results_per_uf(data_dir: Path):
-    result = runner.run(HousingRealityParams(ufs=[UF.AC]))
+    result = runner.run(HousingRealityParams(source="census_2010", ufs=[UF.AC]))
     assert "AC" in result
 
 
 def test_run_returns_mapped_parquet_paths(data_dir: Path):
-    result = runner.run(HousingRealityParams(ufs=[UF.AC]))
+    result = runner.run(HousingRealityParams(source="census_2010", ufs=[UF.AC]))
     assert "domicilios" in result["AC"]
     assert result["AC"]["domicilios"].exists()
 
 
+def test_run_raises_without_source():
+    with pytest.raises(ValueError, match="source required"):
+        runner.run(HousingRealityParams(ufs=[UF.AC]))
+
+
+def test_find_local_raises_without_source():
+    with pytest.raises(ValueError, match="source required"):
+        runner.find_local_results(HousingRealityParams())

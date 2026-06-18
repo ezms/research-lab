@@ -12,50 +12,39 @@ load_dotenv()
 
 import lab.research.housing_reality.manifest  # noqa: F401 — populates registry
 
-from lab.platform.research.registry import get_registry
+from lab.enums.uf import UF
+from lab.research.housing_reality.params import HousingRealityParams
+from lab.research.housing_reality.pipeline.runner import find_local_results
 
 st.set_page_config(page_title="Research Lab", layout="wide")
 
+_SOURCE_LABELS = {
+    "census_2010": "Censo Demográfico 2010",
+    "pnadc_visita1": "PNADC Anual Visita 1",
+}
+_UFS = [uf.value for uf in UF]
+
 # ── Session state ──────────────────────────────────────────────────────────────
 
-if "view" not in st.session_state:
-    st.session_state.view = "catalog"
-if "manifest_id" not in st.session_state:
-    st.session_state.manifest_id = None
-if "collect_procs" not in st.session_state:
-    st.session_state.collect_procs = {}  # manifest_id → Popen
-
-registry = get_registry()
-
+if "collect_proc" not in st.session_state:
+    st.session_state.collect_proc = None
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
-def _local(manifest_cls) -> dict | None:
-    return manifest_cls.local_results(manifest_cls.params_model())
+def _collecting() -> bool:
+    proc = st.session_state.collect_proc
+    if proc is None:
+        return False
+    if proc.poll() is not None:
+        st.session_state.collect_proc = None
+        return False
+    return True
 
 
-def _save(manifest_cls) -> None:
-    from lab.infrastructure.research.duckdb_repository import make_repository
-    local = _local(manifest_cls)
-    if not local:
-        return
-    repo = make_repository()
-    items = [(uf, ft, path) for uf, files in local.items() for ft, path in files.items()]
-    total = len(items)
-    bar = st.progress(0, text="Conectando…")
-    status = st.empty()
-    for idx, (uf, ft, path) in enumerate(items):
-        status.caption(f"Salvando {uf}/{ft} ({idx + 1}/{total})…")
-        repo.save(manifest_cls.id, uf, ft, path)
-        bar.progress((idx + 1) / total)
-    bar.empty()
-    status.empty()
-
-
-def _start_collection(manifest_cls) -> None:
+def _start_collection(params: HousingRealityParams) -> None:
     payload = json.dumps({
-        "manifest": f"{manifest_cls.__module__}:{manifest_cls.__qualname__}",
-        "params": manifest_cls.params_model().model_dump(mode="json"),
+        "manifest": "lab.research.housing_reality.manifest:HousingRealityResearch",
+        "params": params.model_dump(mode="json"),
     }).encode()
     proc = subprocess.Popen(
         [sys.executable, "-m", "lab.ui._pipeline_runner"],
@@ -65,131 +54,104 @@ def _start_collection(manifest_cls) -> None:
     )
     proc.stdin.write(payload)
     proc.stdin.close()
-    st.session_state.collect_procs[manifest_cls.id] = proc
+    st.session_state.collect_proc = proc
 
 
-# ── Catalog ────────────────────────────────────────────────────────────────────
-
-def view_catalog() -> None:
-    st.title("Research Lab")
-
-    for mid, proc in list(st.session_state.collect_procs.items()):
-        if proc.poll() is not None:
-            del st.session_state.collect_procs[mid]
-
-
-    cols = st.columns(3, gap="large")
-    for i, (manifest_id, manifest_cls) in enumerate(registry.items()):
-        with cols[i % 3]:
-            local = _local(manifest_cls)
-            collecting = manifest_id in st.session_state.collect_procs
-
-            with st.container(border=True):
-                st.subheader(manifest_cls.name)
-                st.caption(manifest_cls.description)
-
-                if collecting:
-                    st.info("⟳ Coletando em background…")
-                elif local:
-                    ufs = sorted(local.keys())
-                    all_key = f"all_ufs_{manifest_id}"
-                    todas = st.checkbox("Todas as UFs", value=True, key=all_key)
-                    if todas:
-                        selected = ufs
-                        st.caption(f"{len(ufs)} UF(s) coletadas")
-                    else:
-                        selected = st.multiselect("UFs", ufs, default=ufs, key=f"ufs_{manifest_id}")
-                        if not selected:
-                            selected = ufs
-                    st.session_state[f"selected_ufs_{manifest_id}"] = selected
-
-                c1, c2, c3 = st.columns(3)
-                with c1:
-                    if local and st.button("Visualizar", key=f"v_{manifest_id}", type="primary", use_container_width=True):
-                        st.session_state.view = "explore"
-                        st.session_state.manifest_id = manifest_id
-                        st.rerun()
-                with c2:
-                    label = "Coletar mais" if local else "Coletar"
-                    if not collecting and st.button(label, key=f"c_{manifest_id}", use_container_width=True):
-                        _start_collection(manifest_cls)
-                        st.rerun()
-                with c3:
-                    if local and st.button("Salvar", key=f"s_{manifest_id}", use_container_width=True):
-                        _save(manifest_cls)
-
-    if st.session_state.collect_procs:
-        time.sleep(2)
-        st.rerun()
+def _save(params: HousingRealityParams, local: dict) -> None:
+    from lab.infrastructure.research.duckdb_repository import make_repository
+    repo = make_repository()
+    items = [(uf, ft, path) for uf, files in local.items() for ft, path in files.items()]
+    bar = st.progress(0, text="Conectando…")
+    status = st.empty()
+    for idx, (uf, ft, path) in enumerate(items):
+        status.caption(f"Salvando {uf}/{ft} ({idx + 1}/{len(items)})…")
+        repo.save("housing_reality", uf, ft, path)
+        bar.progress((idx + 1) / len(items))
+    bar.empty()
+    status.empty()
+    st.success("Salvo!")
 
 
-# ── Explore ────────────────────────────────────────────────────────────────────
+# ── Header: Form ───────────────────────────────────────────────────────────────
 
-def view_explore() -> None:
-    manifest_id = st.session_state.manifest_id
-    manifest_cls = registry.get(manifest_id)
+st.title("Research Lab")
 
-    if st.button("← Catálogo"):
-        st.session_state.view = "catalog"
-        st.rerun()
+col1, col2, col3 = st.columns([2, 3, 1])
+with col1:
+    source = st.selectbox(
+        "Pesquisa",
+        list(_SOURCE_LABELS.keys()),
+        format_func=_SOURCE_LABELS.get,
+    )
+with col2:
+    selected_ufs = st.multiselect("UFs", _UFS, placeholder="Todas")
+with col3:
+    st.write("")  # vertical alignment
+    searched = st.button("Pesquisar", type="primary", use_container_width=True)
 
-    if not manifest_cls:
-        return
+params = HousingRealityParams(
+    source=source,
+    ufs=[UF(u) for u in selected_ufs] or None,
+)
 
-    local = _local(manifest_cls)
-    if not local:
-        st.warning("Nenhum dado local disponível. Colete primeiro no catálogo.")
-        return
+# ── Body: Results ──────────────────────────────────────────────────────────────
 
-    st.title(manifest_cls.name)
+local = find_local_results(params)
 
-    with st.sidebar:
-        st.header("Filtros")
-        ufs_available = sorted(local.keys())
-        preselected = st.session_state.get(f"selected_ufs_{manifest_id}", ufs_available)
-        selected_ufs = st.multiselect("UFs", ufs_available, default=preselected)
-        viz = st.radio("Visualização", ["Tabela", "Gráfico"])
-        if viz == "Tabela":
-            sample_files = sorted(next(iter(local.values())).keys())
-            selected_files = st.multiselect("Arquivos", sample_files, default=sample_files)
-            limit = st.slider("Linhas por arquivo", 100, 2000, 500, step=100)
-
-    if not selected_ufs:
-        st.info("Selecione pelo menos uma UF.")
-        return
+if local:
+    viz = st.radio("Visualização", ["Tabela", "Gráfico"], horizontal=True)
 
     if viz == "Tabela":
-        if not selected_files:
-            st.info("Selecione pelo menos um arquivo.")
-        else:
-            for file_type in selected_files:
-                st.header(file_type)
-                for uf in selected_ufs:
-                    path = local.get(uf, {}).get(file_type)
-                    if not path:
-                        continue
-                    st.subheader(uf)
-                    df = duckdb.execute(f"SELECT * FROM read_parquet('{path}') LIMIT {limit}").df()
-                    st.dataframe(df, use_container_width=True)
+        file_types = sorted({ft for files in local.values() for ft in files})
+        selected_fts = st.multiselect("Arquivos", file_types, default=file_types)
+        limit = st.slider("Linhas por arquivo", 100, 2000, 500, step=100)
+
+        for ft in selected_fts:
+            st.subheader(ft)
+            for uf, files in sorted(local.items()):
+                path = files.get(ft)
+                if not path:
+                    continue
+                st.caption(uf)
+                df = duckdb.execute(f"SELECT * FROM read_parquet('{path}') LIMIT {limit}").df()
+                st.dataframe(df, use_container_width=True)
 
     else:
         counts: dict[str, int] = {}
-        for uf in selected_ufs:
-            path = local.get(uf, {}).get("domicilios")
+        for uf, files in local.items():
+            path = files.get("domicilios") or files.get("moradores")
             if path:
                 n = duckdb.execute(f"SELECT COUNT(*) FROM read_parquet('{path}')").fetchone()[0]
                 counts[uf] = n
-
         if counts:
-            df_chart = pd.DataFrame.from_dict(counts, orient="index", columns=["Domicílios"])
-            st.bar_chart(df_chart, x_label="UF", y_label="Domicílios")
+            df_chart = pd.DataFrame.from_dict(counts, orient="index", columns=["Registros"])
+            st.bar_chart(df_chart, x_label="UF", y_label="Registros")
         else:
-            st.warning("Arquivo 'domicilios' não disponível para as UFs selecionadas.")
+            st.warning("Nenhum arquivo de referência disponível para as UFs selecionadas.")
 
+elif searched:
+    st.info("Nenhum dado local. Use **Coletar** abaixo para iniciar a coleta.")
 
-# ── Router ─────────────────────────────────────────────────────────────────────
+# ── Footer: Actions ────────────────────────────────────────────────────────────
 
-if st.session_state.view == "catalog":
-    view_catalog()
-elif st.session_state.view == "explore":
-    view_explore()
+st.divider()
+fcol1, fcol2, _ = st.columns([1, 1, 4])
+
+collecting = _collecting()
+
+with fcol1:
+    if collecting:
+        st.info("⟳ Coletando em background…")
+    else:
+        label = "Coletar mais" if local else "Coletar"
+        if st.button(label, use_container_width=True):
+            _start_collection(params)
+            st.rerun()
+
+with fcol2:
+    if local and st.button("Salvar", use_container_width=True):
+        _save(params, local)
+
+if collecting:
+    time.sleep(2)
+    st.rerun()

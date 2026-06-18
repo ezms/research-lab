@@ -5,10 +5,10 @@ import pandas as pd
 import pyarrow.parquet as pq
 import pytest
 
+from lab.research.housing_reality.sources._utils import _is_valid_zip
 from lab.research.housing_reality.sources.pnadc_visita1 import (
     PNADCVisita1DataSource,
     _fwf_params,
-    _is_valid_zip,
     _to_snake,
 )
 

@@ -9,6 +9,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from lab.research.housing_reality.domain.ports import HousingDataSource
+from lab.research.housing_reality.sources._utils import _is_valid_zip
 
 _BASE_URL = (
     "https://ftp.ibge.gov.br/Trabalho_e_Rendimento"
@@ -33,13 +34,6 @@ def _to_snake(text: object) -> str:
     normalized = unicodedata.normalize("NFKD", str(text)).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z0-9]+", "_", normalized.lower()).strip("_")
 
-
-def _is_valid_zip(path: Path) -> bool:
-    try:
-        with zipfile.ZipFile(path):
-            return True
-    except zipfile.BadZipFile:
-        return False
 
 
 def _fwf_params(layout: pd.DataFrame) -> tuple[list, list, dict]:

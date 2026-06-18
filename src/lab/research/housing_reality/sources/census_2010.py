@@ -1,5 +1,7 @@
 import logging
 import re
+import shutil
+import tempfile
 import unicodedata
 import zipfile
 from pathlib import Path
@@ -11,6 +13,7 @@ import pyarrow.parquet as pq
 
 from lab.enums.uf import UF
 from lab.research.housing_reality.domain.ports import HousingDataSource
+from lab.research.housing_reality.sources._utils import _is_valid_zip
 
 _log = logging.getLogger(__name__)
 _LAYOUT_DIR = Path(__file__).parent / "census_2010_layout"
@@ -23,18 +26,15 @@ _FILE_TYPES = {
 }
 
 # UFs where IBGE splits the zip into multiple parts.
-# Each entry lists the zip name stems (without .zip) in download order.
 _UF_ZIP_PARTS: dict[str, list[str]] = {
     "SP": ["SP1", "SP2_RM"],
 }
 
-
-def _is_valid_zip(path: Path) -> bool:
-    try:
-        with zipfile.ZipFile(path):
-            return True
-    except zipfile.BadZipFile:
-        return False
+_BASE_URL = (
+    "https://ftp.ibge.gov.br/Censos/Censo_Demografico_2010"
+    "/Resultados_Gerais_da_Amostra/Microdados"
+)
+_MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024
 
 
 def _to_snake(text: object) -> str:
@@ -76,33 +76,24 @@ def _fwf_params(
     return colspecs, names, dtypes
 
 
-class Census2010DataSource(HousingDataSource):
-    BASE_URL = (
-        "https://ftp.ibge.gov.br/Censos/Censo_Demografico_2010"
-        "/Resultados_Gerais_da_Amostra/Microdados"
-    )
-    MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024
-
-    def __init__(self, work_dir: Path, uf: UF | None = None) -> None:
-        self._uf = uf
-        self._work_dir = work_dir / "census_2010" if uf is None else work_dir
-
-    def _download_zip(self, stem: str) -> Path:
-        output_path = self._work_dir / f"{stem}.zip"
+def _download(work_dir: Path, uf: UF) -> None:
+    parts = _UF_ZIP_PARTS.get(uf.value, [uf.value])
+    for stem in parts:
+        output_path = work_dir / f"{stem}.zip"
+        if output_path.exists() and _is_valid_zip(output_path):
+            continue
         if output_path.exists():
-            if _is_valid_zip(output_path):
-                return output_path
             output_path.unlink()
 
-        url = f"{self.BASE_URL}/{stem}.zip"
+        url = f"{_BASE_URL}/{stem}.zip"
         with httpx.Client() as client:
             head = client.head(url)
             head.raise_for_status()
             content_length = int(head.headers.get("content-length", 0))
-            if content_length > self.MAX_FILE_SIZE_BYTES:
+            if content_length > _MAX_FILE_SIZE_BYTES:
                 raise ValueError(
                     f"File too large: {content_length} bytes "
-                    f"exceeds limit of {self.MAX_FILE_SIZE_BYTES} bytes"
+                    f"exceeds limit of {_MAX_FILE_SIZE_BYTES} bytes"
                 )
             with client.stream("GET", url) as response:
                 response.raise_for_status()
@@ -110,127 +101,120 @@ class Census2010DataSource(HousingDataSource):
                     for chunk in response.iter_bytes(chunk_size=1024 * 1024):
                         f.write(chunk)
 
-        return output_path
 
-    def download(self) -> Path:
-        self._work_dir.mkdir(parents=True, exist_ok=True)
-        parts = _UF_ZIP_PARTS.get(self._uf.value, [self._uf.value])
+def _parse(work_dir: Path, uf: UF) -> dict[str, Path]:
+    raw_dir = work_dir / uf.value
+    parsed_dir = raw_dir / "parsed"
+    parsed_dir.mkdir(parents=True, exist_ok=True)
+
+    if not any(raw_dir.glob("*.txt")):
+        parts = _UF_ZIP_PARTS.get(uf.value, [uf.value])
+        seen: set[str] = set()
         for stem in parts:
-            self._download_zip(stem)
-        return self._work_dir / f"{parts[0]}.zip"
+            with tempfile.TemporaryDirectory() as tmp:
+                tmp_path = Path(tmp)
+                with zipfile.ZipFile(work_dir / f"{stem}.zip") as z:
+                    z.extractall(tmp_path)
+                for txt in sorted(tmp_path.rglob("*.txt")):
+                    prefix = next(
+                        (p for p in _FILE_TYPES.values() if txt.name.startswith(p)),
+                        None,
+                    )
+                    if prefix is None:
+                        continue
+                    dest = raw_dir / f"{prefix}_{uf.value}.txt"
+                    if prefix not in seen:
+                        shutil.copy(txt, dest)
+                        seen.add(prefix)
+                    else:
+                        with dest.open("ab") as out:
+                            out.write(txt.read_bytes())
 
-    def parse(self, file_path: Path) -> dict[str, Path]:
-        raw_dir = self._work_dir / self._uf.value
-        parsed_dir = raw_dir / "parsed"
-        parsed_dir.mkdir(parents=True, exist_ok=True)
-
-        if not any(raw_dir.glob("*.txt")):
-            import shutil
-            import tempfile
-
-            parts = _UF_ZIP_PARTS.get(self._uf.value, [self._uf.value])
-            # Merge txt files from all parts into raw_dir, grouped by file-type prefix
-            seen: set[str] = set()
-            for stem in parts:
-                with tempfile.TemporaryDirectory() as tmp:
-                    tmp_path = Path(tmp)
-                    with zipfile.ZipFile(self._work_dir / f"{stem}.zip") as z:
-                        z.extractall(tmp_path)
-                    for txt in sorted(tmp_path.rglob("*.txt")):
-                        prefix = next(
-                            (p for p in _FILE_TYPES.values() if txt.name.startswith(p)),
-                            None,
-                        )
-                        if prefix is None:
-                            continue
-                        dest = raw_dir / f"{prefix}_{self._uf.value}.txt"
-                        if prefix not in seen:
-                            shutil.copy(txt, dest)
-                            seen.add(prefix)
-                        else:
-                            with dest.open("ab") as out:
-                                out.write(txt.read_bytes())
-
-        result: dict[str, Path] = {}
-        for name, prefix in _FILE_TYPES.items():
-            parquet_path = parsed_dir / f"{name}.parquet"
-            if parquet_path.exists():
-                result[name] = parquet_path
-                continue
-
-            matches = list(raw_dir.glob(f"{prefix}_*.txt"))
-            if not matches:
-                continue
-
-            layout = pd.read_csv(_LAYOUT_DIR / f"{name}.csv")
-            colspecs, var_names, dtypes = _fwf_params(layout)
-            dec_cols = {
-                row["variable"]: 10 ** int(float(row["decimals"]))
-                for _, row in layout.iterrows()
-                if str(row["decimals"]).strip() not in ("", "nan")
-            }
-
-            reader = pd.read_fwf(
-                matches[0],
-                colspecs=colspecs,
-                names=var_names,
-                header=None,
-                encoding="latin-1",
-                chunksize=100_000,
-            )
-            writer: pq.ParquetWriter | None = None
-            tmp_path = parquet_path.with_suffix(".tmp.parquet")
-            try:
-                for chunk in reader:
-                    chunk = chunk.astype(dtypes)
-                    for col, divisor in dec_cols.items():
-                        chunk[col] /= divisor
-                    table = pa.Table.from_pandas(chunk, preserve_index=False)
-                    if writer is None:
-                        writer = pq.ParquetWriter(tmp_path, table.schema, compression="snappy")
-                    writer.write_table(table)
-            finally:
-                if writer:
-                    writer.close()
-            tmp_path.rename(parquet_path)
+    result: dict[str, Path] = {}
+    for name, prefix in _FILE_TYPES.items():
+        parquet_path = parsed_dir / f"{name}.parquet"
+        if parquet_path.exists():
             result[name] = parquet_path
+            continue
 
-        return result
+        matches = list(raw_dir.glob(f"{prefix}_*.txt"))
+        if not matches:
+            continue
 
-    def map_variables(self, parsed_data: dict[str, Path]) -> dict[str, Path]:
-        mapped_dir = self._work_dir / self._uf.value / "mapped"
-        mapped_dir.mkdir(parents=True, exist_ok=True)
+        layout = pd.read_csv(_LAYOUT_DIR / f"{name}.csv")
+        colspecs, var_names, dtypes = _fwf_params(layout)
+        dec_cols = {
+            row["variable"]: 10 ** int(float(row["decimals"]))
+            for _, row in layout.iterrows()
+            if str(row["decimals"]).strip() not in ("", "nan")
+        }
 
-        result: dict[str, Path] = {}
-        for name, parquet_path in parsed_data.items():
-            mapped_path = mapped_dir / f"{name}.parquet"
-            if mapped_path.exists():
-                result[name] = mapped_path
-                continue
+        reader = pd.read_fwf(
+            matches[0],
+            colspecs=colspecs,
+            names=var_names,
+            header=None,
+            encoding="latin-1",
+            chunksize=100_000,
+        )
+        writer: pq.ParquetWriter | None = None
+        tmp_path = parquet_path.with_suffix(".tmp.parquet")
+        try:
+            for chunk in reader:
+                chunk = chunk.astype(dtypes)
+                for col, divisor in dec_cols.items():
+                    chunk[col] /= divisor
+                table = pa.Table.from_pandas(chunk, preserve_index=False)
+                if writer is None:
+                    writer = pq.ParquetWriter(tmp_path, table.schema, compression="snappy")
+                writer.write_table(table)
+        finally:
+            if writer:
+                writer.close()
+        tmp_path.rename(parquet_path)
+        result[name] = parquet_path
 
-            layout = pd.read_csv(_LAYOUT_DIR / f"{name}.csv")
-            rename_map = {
-                row["variable"]: (_to_snake(row["description"]) or row["variable"].lower())
-                for _, row in layout.iterrows()
-            }
+    return result
 
-            df = pd.read_parquet(parquet_path)
-            df = df.rename(columns=rename_map)
-            df.to_parquet(mapped_path, index=False, compression="snappy")
+
+def _map_variables(work_dir: Path, uf: UF, parsed: dict[str, Path]) -> dict[str, Path]:
+    mapped_dir = work_dir / uf.value / "mapped"
+    mapped_dir.mkdir(parents=True, exist_ok=True)
+
+    result: dict[str, Path] = {}
+    for name, parquet_path in parsed.items():
+        mapped_path = mapped_dir / f"{name}.parquet"
+        if mapped_path.exists():
             result[name] = mapped_path
+            continue
 
-        return result
+        layout = pd.read_csv(_LAYOUT_DIR / f"{name}.csv")
+        rename_map = {
+            row["variable"]: (_to_snake(row["description"]) or row["variable"].lower())
+            for _, row in layout.iterrows()
+        }
 
+        df = pd.read_parquet(parquet_path)
+        df = df.rename(columns=rename_map)
+        df.to_parquet(mapped_path, index=False, compression="snappy")
+        result[name] = mapped_path
+
+    return result
+
+
+class Census2010DataSource(HousingDataSource):
+    def __init__(self, work_dir: Path) -> None:
+        self._work_dir = work_dir / "census_2010"
 
     def collect(self, params) -> dict[str, dict[str, Path]]:
         ufs = params.ufs or list(UF)
         results: dict[str, dict[str, Path]] = {}
         for uf in ufs:
             try:
-                source = Census2010DataSource(work_dir=self._work_dir, uf=uf)
-                zip_path = source.download()
-                parsed = source.parse(zip_path)
-                results[uf.value] = source.map_variables(parsed)
+                self._work_dir.mkdir(parents=True, exist_ok=True)
+                _download(self._work_dir, uf)
+                parsed = _parse(self._work_dir, uf)
+                results[uf.value] = _map_variables(self._work_dir, uf, parsed)
             except Exception as exc:
                 _log.error("UF %s falhou: %s", uf.value, exc)
         return results
