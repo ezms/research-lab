@@ -14,7 +14,7 @@ from lab.research.housing_reality.sources._utils import _is_valid_zip
 _BASE_URL = (
     "https://ftp.ibge.gov.br/Trabalho_e_Rendimento"
     "/Pesquisa_Nacional_por_Amostra_de_Domicilios_continua"
-    "/Anual/Microdados/Visita/Visita_1"
+    "/Anual/Microdados/Visita/Visita_1/Dados"
 )
 _LAYOUT_DIR = Path(__file__).parent / "pnadc_layout"
 
@@ -83,6 +83,8 @@ class PNADCVisita1DataSource(HousingDataSource):
             return None
         results: dict[str, dict[str, Path]] = {}
         for path in sorted(mapped_dir.glob("*.parquet")):
+            if path.name.endswith(".tmp.parquet"):
+                continue
             parts = path.stem.split("_", 1)
             if len(parts) != 2:
                 continue
@@ -179,7 +181,9 @@ class PNADCVisita1DataSource(HousingDataSource):
                     continue
                 df = pd.read_parquet(parsed_path)
                 df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
-                df.to_parquet(out_path, compression="snappy", index=False)
+                tmp_path = out_path.with_suffix(".tmp.parquet")
+                df.to_parquet(tmp_path, compression="snappy", index=False)
+                tmp_path.rename(out_path)  # atomic: readers never see a partial file
                 result[uf_abbr][file_type] = out_path
         return result
 

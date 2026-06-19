@@ -196,7 +196,9 @@ def _map_variables(work_dir: Path, uf: UF, parsed: dict[str, Path]) -> dict[str,
 
         df = pd.read_parquet(parquet_path)
         df = df.rename(columns=rename_map)
-        df.to_parquet(mapped_path, index=False, compression="snappy")
+        tmp_path = mapped_path.with_suffix(".tmp.parquet")
+        df.to_parquet(tmp_path, index=False, compression="snappy")
+        tmp_path.rename(mapped_path)  # atomic: readers never see a partial file
         result[name] = mapped_path
 
     return result
@@ -226,7 +228,11 @@ class Census2010DataSource(HousingDataSource):
             mapped_dir = self._work_dir / uf.value / "mapped"
             if not mapped_dir.exists():
                 continue
-            files = {p.stem: p for p in sorted(mapped_dir.glob("*.parquet"))}
+            files = {
+                p.stem: p
+                for p in sorted(mapped_dir.glob("*.parquet"))
+                if not p.name.endswith(".tmp.parquet")
+            }
             if files:
                 results[uf.value] = files
         return results or None

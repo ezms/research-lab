@@ -4,8 +4,14 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from lab.enums.uf import UF
+from lab.research.housing_reality.params import HousingRealityParams
 from lab.research.housing_reality.sources._utils import _is_valid_zip
-from lab.research.housing_reality.sources.census_2010 import _fwf_params, _to_snake
+from lab.research.housing_reality.sources.census_2010 import (
+    Census2010DataSource,
+    _fwf_params,
+    _to_snake,
+)
 
 
 class TestToSnake:
@@ -100,3 +106,15 @@ class TestIsValidZip:
         path = tmp_path / "empty.zip"
         path.write_bytes(b"")
         assert _is_valid_zip(path) is False
+
+
+class TestFindLocal:
+    def test_excludes_tmp_parquet(self, tmp_path: Path):
+        mapped = tmp_path / "census_2010" / "AC" / "mapped"
+        mapped.mkdir(parents=True)
+        pd.DataFrame({"x": [1]}).to_parquet(mapped / "domicilios.parquet")
+        (mapped / "pessoas.tmp.parquet").write_bytes(b"")  # half-written, must be ignored
+
+        result = Census2010DataSource(tmp_path).find_local(HousingRealityParams(ufs=[UF.AC]))
+
+        assert result == {"AC": {"domicilios": mapped / "domicilios.parquet"}}

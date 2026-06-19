@@ -31,6 +31,8 @@ if "research_id" not in st.session_state:
     st.session_state.research_id = None
 if "collect_proc" not in st.session_state:
     st.session_state.collect_proc = None
+if "collect_error" not in st.session_state:
+    st.session_state.collect_error = None
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -39,6 +41,8 @@ def _collecting() -> bool:
     if proc is None:
         return False
     if proc.poll() is not None:
+        if proc.returncode != 0 and proc.stderr:
+            st.session_state.collect_error = proc.stderr.read().decode(errors="replace").strip()
         st.session_state.collect_proc = None
         return False
     return True
@@ -123,9 +127,27 @@ def view_research(research_id: str) -> None:
         ufs=[UF(u) for u in selected_ufs] or None,
     )
 
-    # Body
-    local = find_local_results(params)
+    local = find_local_results(params)  # cheap: globs the filesystem, no reads
+    collecting = _collecting()
 
+    if st.session_state.collect_error and not collecting:
+        st.error("A coleta falhou:")
+        st.code(st.session_state.collect_error[-3000:])
+
+    # ── Collecting: show progress on top, skip tables (files are being written) ──
+    if collecting:
+        done = sorted(local.keys()) if local else []
+        pending = [u for u in _UFS if u not in done]
+        current = pending[0] if pending else "—"
+        st.info(f"⟳ Coletando **{current}** · {len(done)}/{len(_UFS)} UFs prontas")
+        st.progress(len(done) / len(_UFS))
+        if done:
+            st.caption("Prontas: " + ", ".join(done))
+        time.sleep(2)
+        st.rerun()
+        return
+
+    # ── Idle: results + actions ──────────────────────────────────────────────────
     if local:
         viz = st.radio("Visualização", ["Tabela", "Gráfico"], horizontal=True)
 
@@ -141,8 +163,11 @@ def view_research(research_id: str) -> None:
                     if not path:
                         continue
                     st.caption(uf)
-                    df = duckdb.execute(f"SELECT * FROM read_parquet('{path}') LIMIT {limit}").df()
-                    st.dataframe(df, use_container_width=True)
+                    try:
+                        df = duckdb.execute(f"SELECT * FROM read_parquet('{path}') LIMIT {limit}").df()
+                        st.dataframe(df, use_container_width=True)
+                    except Exception as exc:
+                        st.warning(f"Não foi possível ler {uf}/{ft}: {exc}")
         else:
             counts: dict[str, int] = {}
             for uf, files in local.items():
@@ -158,27 +183,17 @@ def view_research(research_id: str) -> None:
     else:
         st.info("Nenhum dado local. Use **Coletar** abaixo para iniciar a coleta.")
 
-    # Footer
     st.divider()
     fcol1, fcol2, _ = st.columns([1, 1, 4])
-    collecting = _collecting()
-
     with fcol1:
-        if collecting:
-            st.info("⟳ Coletando em background…")
-        else:
-            label = "Coletar mais" if local else "Coletar"
-            if st.button(label, use_container_width=True):
-                _start_collection(manifest_cls, params)
-                st.rerun()
-
+        label = "Coletar mais" if local else "Coletar"
+        if st.button(label, use_container_width=True):
+            st.session_state.collect_error = None
+            _start_collection(manifest_cls, params)
+            st.rerun()
     with fcol2:
         if local and st.button("Salvar", use_container_width=True):
             _save(params, local)
-
-    if collecting:
-        time.sleep(2)
-        st.rerun()
 
 
 # ── Router ─────────────────────────────────────────────────────────────────────
