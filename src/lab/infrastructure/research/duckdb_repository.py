@@ -49,15 +49,17 @@ class DuckDBResearchRepository(ResearchRepository):
         return int(result.iloc[0, 0]) > 0
 
 
-def make_repository() -> DuckDBResearchRepository:
+def make_db() -> DuckDBAdapter:
     token = os.environ.get("MOTHERDUCK_TOKEN")
     if token:
         bootstrap = duckdb.connect(f"md:?motherduck_token={token}")
         bootstrap.execute("CREATE DATABASE IF NOT EXISTS research")
         bootstrap.close()
-        db = DuckDBAdapter(connection_string=f"md:research?motherduck_token={token}")
-    else:
-        db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
-        db_path.parent.mkdir(parents=True, exist_ok=True)
-        db = DuckDBAdapter(db_path=db_path)
-    return DuckDBResearchRepository(db)
+        return DuckDBAdapter(connection_string=f"md:research?motherduck_token={token}")
+    db_path = Path(os.environ.get("RESEARCH_LAB_DATA_DIR", "data")) / "research.duckdb"
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    return DuckDBAdapter(db_path=db_path)
+
+
+def make_repository() -> DuckDBResearchRepository:
+    return DuckDBResearchRepository(make_db())
