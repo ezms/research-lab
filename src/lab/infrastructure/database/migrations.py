@@ -4,6 +4,7 @@ Applies numbered `*.sql` files in order, tracking applied versions in a
 `schema_migrations` table. No rollback — just add a new migration to change schema.
 """
 import logging
+import os
 from pathlib import Path
 
 from lab.infrastructure.database.duckdb_adapter import DuckDBAdapter
@@ -37,8 +38,12 @@ def apply_migrations(db: DuckDBAdapter, migrations_dir: Path = _MIGRATIONS_DIR) 
 
 
 if __name__ == "__main__":
+    from dotenv import load_dotenv
+
     from lab.infrastructure.research.duckdb_repository import make_db
 
+    load_dotenv()  # honra MOTHERDUCK_TOKEN do .env, igual o streamlit_app
     logging.basicConfig(level=logging.INFO)
+    target = "MotherDuck" if os.environ.get("MOTHERDUCK_TOKEN") else "local"
     applied = apply_migrations(make_db())
-    print(f"Migrations aplicadas: {applied or 'nenhuma (banco já atualizado)'}")
+    print(f"[{target}] Migrations aplicadas: {applied or 'nenhuma (banco já atualizado)'}")
