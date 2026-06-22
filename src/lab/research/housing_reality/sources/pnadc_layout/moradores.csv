@@ -1,6 +1,9 @@
 variable,description,start,end,length,decimals,type
 Ano,Ano de referência,1,4,4,,C
 UF,Unidade da Federação,6,7,2,,C
+UPA,UPA,12,20,9,,C
+V1008,Número de seleção do domicílio,28,29,2,,C
+V1014,Painel,30,31,2,,C
 V1022,Tipo de situação da região,32,32,1,,C
 V1023,Tipo de área,33,33,1,,C
 V1032,Peso com calibração,58,72,15,,N
