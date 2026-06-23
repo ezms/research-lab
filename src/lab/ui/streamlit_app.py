@@ -11,11 +11,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import lab.research.housing_reality.manifest  # noqa: F401 — populates registry
+import lab.research.property_inventory.manifest  # noqa: F401 — populates registry
 
 from lab.enums.uf import UF
 from lab.platform.research.registry import get_registry
 from lab.research.housing_reality.params import HousingRealityParams
-from lab.research.housing_reality.pipeline.runner import find_local_results
+from lab.research.housing_reality.pipeline.runner import find_local_results as _housing_find_local
+from lab.research.property_inventory.params import PropertyInventoryParams
+from lab.research.property_inventory.pipeline.runner import find_local_results as _property_find_local
 
 st.set_page_config(page_title="Research Lab", layout="wide")
 
@@ -48,7 +51,7 @@ def _collecting() -> bool:
     return True
 
 
-def _start_collection(manifest_cls, params: HousingRealityParams) -> None:
+def _start_collection(manifest_cls, params) -> None:
     payload = json.dumps({
         "manifest": f"{manifest_cls.__module__}:{manifest_cls.__qualname__}",
         "params": params.model_dump(mode="json"),
@@ -64,7 +67,7 @@ def _start_collection(manifest_cls, params: HousingRealityParams) -> None:
     st.session_state.collect_proc = proc
 
 
-def _save(params: HousingRealityParams, local: dict) -> None:
+def _save(params, local: dict) -> None:
     from lab.infrastructure.research.duckdb_repository import make_repository
     repo = make_repository()
     items = [(uf, ft, path) for uf, files in local.items() for ft, path in files.items()]
@@ -127,7 +130,7 @@ def view_research(research_id: str) -> None:
         ufs=[UF(u) for u in selected_ufs] or None,
     )
 
-    local = find_local_results(params)  # cheap: globs the filesystem, no reads
+    local = _housing_find_local(params)  # cheap: globs the filesystem, no reads
     collecting = _collecting()
 
     if st.session_state.collect_error and not collecting:
@@ -196,9 +199,76 @@ def view_research(research_id: str) -> None:
             _save(params, local)
 
 
+def view_property_inventory() -> None:
+    registry = get_registry()
+    manifest_cls = registry["property_inventory"]
+
+    if st.button("← Pesquisas"):
+        st.session_state.research_id = None
+        st.session_state.collect_proc = None
+        st.rerun()
+
+    st.title(manifest_cls.name)
+
+    col_negocio, col_ufs, col_btn = st.columns([2, 3, 1])
+    with col_negocio:
+        negocio_label = st.selectbox("Negócio", ["Todos", "Venda", "Aluguel"])
+        negocio = None if negocio_label == "Todos" else negocio_label.lower()
+    with col_ufs:
+        selected_ufs = st.multiselect("UFs", _UFS, placeholder="Todas")
+    with col_btn:
+        st.markdown('<p style="visibility:hidden;font-size:14px;margin-bottom:4px">.</p>', unsafe_allow_html=True)
+        st.button("Pesquisar", type="primary", use_container_width=True)
+
+    params = PropertyInventoryParams(
+        ufs=[UF(u) for u in selected_ufs] or None,
+        negocio=negocio,
+    )
+
+    local = _property_find_local(params)
+    collecting = _collecting()
+
+    if st.session_state.collect_error and not collecting:
+        st.error("A coleta falhou:")
+        st.code(st.session_state.collect_error[-3000:])
+
+    if collecting:
+        st.info("⟳ Coletando imóveis do MercadoLivre…")
+        st.progress(0)
+        time.sleep(2)
+        st.rerun()
+        return
+
+    if local:
+        limit = st.slider("Linhas por UF", 100, 2000, 500, step=100)
+        for uf, path in sorted(local.items()):
+            st.subheader(uf)
+            try:
+                df = duckdb.execute(f"SELECT * FROM read_parquet('{path}') LIMIT {limit}").df()
+                st.dataframe(df, use_container_width=True)
+            except Exception as exc:
+                st.warning(f"Não foi possível ler {uf}: {exc}")
+    else:
+        st.info("Nenhum dado local. Use **Coletar** abaixo para iniciar a coleta.")
+        st.caption(
+            "⚠️ Requer `ML_APP_ID` e `ML_SECRET` no `.env`. "
+            "Registre gratuitamente em developers.mercadolibre.com.br."
+        )
+
+    st.divider()
+    if st.button("Coletar mais" if local else "Coletar", use_container_width=False):
+        st.session_state.collect_error = None
+        _start_collection(manifest_cls, params)
+        st.rerun()
+
+
 # ── Router ─────────────────────────────────────────────────────────────────────
 
 if st.session_state.research_id is None:
     view_catalog()
+elif st.session_state.research_id == "housing_reality":
+    view_research("housing_reality")
+elif st.session_state.research_id == "property_inventory":
+    view_property_inventory()
 else:
-    view_research(st.session_state.research_id)
+    st.error(f"View não implementada para '{st.session_state.research_id}'")
