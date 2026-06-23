@@ -19,6 +19,14 @@ def _census(work_dir: Path) -> None:
         "rendimento_mensal_domiciliar_em_julho_de_2010": 3000.0,
         "rendimento_domiciliar_per_capita_em_julho_de_2010": 1500.0,
         "codigo_do_municipio": 355030,
+        "abastecimento_de_agua_forma": 1,
+        "esgotamento_sanitario_tipo": 1,
+        "energia_eletrica_existencia": 1,
+        "geladeira_existencia": 1,
+        "maquina_de_lavar_roupa_existencia": 2,
+        "microcomputador_com_acesso_a_internet_existencia": 1,
+        "automovel_para_uso_particular_existencia": 1,
+        "motocicleta_para_uso_particular_existencia": 2,
     }]).to_parquet(d / "domicilios.parquet")
     pd.DataFrame([
         {"peso_amostral": 10.0, "area_de_ponderacao": 1, "controle": 100,
@@ -40,6 +48,14 @@ def _pnadc(work_dir: Path) -> None:
         "rendimento_habitual_domiciliar_mensal": 6000.0,
         "rendimento_habitual_domiciliar_per_capita_mensal": 2000.0,
         "sexo": 2, "idade_na_data_de_referencia": 40, "cor_ou_raca": 2,
+        "principal_forma_de_abastecimento_de_agua": 2,
+        "destino_do_esgoto_do_banheiro": 3,
+        "origem_da_energia_eletrica": 1,
+        "domicilio_possui_geladeira": 2,
+        "domicilio_possui_maquina_de_lavar_roupa": 2,
+        "acessa_a_internet": 1,
+        "possui_automovel_ou_motocicleta_de_uso_pessoal": 2,
+        "combustivel_mais_utilizado_na_preparacao_dos_alimentos": 1,
     }]).to_parquet(d / "SP_moradores.parquet")
 
 
@@ -61,11 +77,36 @@ def test_harmonized_values(db_and_data):
     db, wd = db_and_data
     load(db, wd)
     row = db.query("SELECT * FROM morador WHERE fonte = 'pnadc_2025'").iloc[0]
-    assert row["situacao"] == "urbana"        # tipo_de_situacao_da_regiao = 1
-    assert row["sexo"] == "feminino"          # sexo = 2
-    assert row["cor_raca"] == "preta"         # cor = 2
-    assert row["id_domicilio"] == "350000001_1_5"  # upa_v1008_painel
-    assert pd.isna(row["municipio"])          # PNADC não tem município
+    assert row["situacao"] == "urbana"
+    assert row["sexo"] == "feminino"
+    assert row["cor_raca"] == "preta"
+    assert row["id_domicilio"] == "350000001_1_5"
+    assert pd.isna(row["municipio"])
+    assert row["agua"] == "poco_artesiano"
+    assert row["esgoto"] == "fossa_septica_nao_ligada"
+    assert row["energia"] == "sim"
+    assert row["geladeira"] == True
+    assert row["maquina_lavar"] == False
+    assert row["internet"] == True
+    assert row["auto_moto"] == False
+    assert row["combustivel_cozinha"] == "gas_botijao"
+
+
+def test_census_infra_columns(db_and_data):
+    db, wd = db_and_data
+    load(db, wd)
+    rows = db.query(
+        "SELECT DISTINCT agua, esgoto, energia, geladeira, maquina_lavar, internet, auto_moto"
+        " FROM morador WHERE fonte = 'census_2010'"
+    )
+    r = rows.iloc[0]
+    assert r["agua"] == "rede_geral"
+    assert r["esgoto"] == "rede_geral"
+    assert r["energia"] == "sim"
+    assert r["geladeira"] == True
+    assert r["maquina_lavar"] == False
+    assert r["internet"] == True
+    assert r["auto_moto"] == True
 
 
 def test_idempotent(db_and_data):
